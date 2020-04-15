@@ -70,8 +70,8 @@ Please see the `Development section of the docs <https://openscm-twolayermodel.r
 
 .. sec-begin-links
 
-.. |CI CD| image:: https://github.com/openscm/openscm-twolayermodel/workflows/OpenSCMtwolayermodel%20CI-CD/badge.svg
-    :target: https://github.com/openscm/openscm-twolayermodel/actions?query=workflow%3A%22OpenSCM two layer model+CI-CD%22
+.. |CI CD| image:: https://github.com/openscm/openscm-twolayermodel/workflows/OpenSCM%20Two%20Layer%20Model%20CI-CD/badge.svg
+    :target: https://github.com/openscm/openscm-twolayermodel/actions?query=workflow%3A%22OpenSCM+Two+Layer+Model+CI-CD%22
 .. |PyPI Install| image:: https://github.com/openscm/openscm-twolayermodel/workflows/Test%20PyPI%20install/badge.svg
     :target: https://github.com/openscm/openscm-twolayermodel/actions?query=workflow%3A%22Test+PyPI+install%22
 .. |PyPI| image:: https://img.shields.io/pypi/pyversions/openscm-twolayermodel.svg
