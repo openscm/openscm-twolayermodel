@@ -40,7 +40,6 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",  # pass numpy style docstrings
-    "sphinx_click.ext",
 ]
 autodoc_default_options = {
     "inherited-members": None,
