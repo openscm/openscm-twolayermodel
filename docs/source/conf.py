@@ -10,7 +10,9 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-sys.path.append(os.path.join(os.path.dirname(__file__), "../../src/openscm_twolayermodel"))
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), "../../src/openscm_twolayermodel")
+)
 from _version import get_versions  # isort:skip # append path before
 
 
@@ -132,7 +134,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "openscm-twolayermodel.tex", "OpenSCM Two Layer Model Documentation", author, "manual")
+    (
+        master_doc,
+        "openscm-twolayermodel.tex",
+        "OpenSCM Two Layer Model Documentation",
+        author,
+        "manual",
+    )
 ]
 
 
@@ -141,7 +149,13 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, "openscm-twolayermodel", "OpenSCM Two Layer Model Documentation", [author], 1)
+    (
+        master_doc,
+        "openscm-twolayermodel",
+        "OpenSCM Two Layer Model Documentation",
+        [author],
+        1,
+    )
 ]
 
 

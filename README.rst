@@ -15,8 +15,8 @@ Brief summary
 .. sec-begin-long-description
 .. sec-begin-index
 
-OpenSCM two layer model contains implementations of the two layer radiative forcing driven models by `Held et al. <https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1>`_ and `Geoffroy et al. <https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1>`_.
-[TODO, find reference which has the state-dependent feedback factor..]
+OpenSCM two layer model contains implementations of the two layer radiative forcing driven models by `Held et al. <https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1>`_ and `Geoffroy et al. <https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1>`_
+[TODO, find reference which has the state-dependent feedback factor.]
 
 .. sec-end-index
 
