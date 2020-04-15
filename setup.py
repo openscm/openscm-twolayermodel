@@ -94,7 +94,15 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    keywords=["openscm-twolayermodel", "openscm", "python", "repo", "simple", "climate", "model"],
+    keywords=[
+        "openscm-twolayermodel",
+        "openscm",
+        "python",
+        "repo",
+        "simple",
+        "climate",
+        "model",
+    ],
     packages=find_packages(SOURCE_DIR),  # no exclude as only searching in `src`
     package_dir={"": SOURCE_DIR},
     # include_package_data=True,

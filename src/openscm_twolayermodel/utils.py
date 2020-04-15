@@ -1,3 +1,8 @@
+"""
+Utility functions
+"""
+
+
 def convert_lambda_to_ecs(lambda_val, f2x=3.74):
     """
     Convert a lambda value to equilibrium climate sensitivity (ECS)
@@ -8,7 +13,7 @@ def convert_lambda_to_ecs(lambda_val, f2x=3.74):
         Value of lambda to convert to ECS
 
     f2x : float
-        Value of the forcing due to a doubling of atmospheric |CO2| (TODO: add |CO2 shortcut to docs)
+        Value of the forcing due to a doubling of atmospheric |CO2|
         to assume during the conversion
 
     Returns

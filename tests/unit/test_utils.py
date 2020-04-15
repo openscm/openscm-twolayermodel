@@ -1,7 +1,6 @@
 import numpy.testing as npt
 import pytest
 
-
 from openscm_twolayermodel.utils import convert_lambda_to_ecs
 
 
@@ -16,7 +15,5 @@ def test_convert_lambda_to_ecs(ecs, f2x):
     else:
         f2x_expected = f2x
         call_kwargs["f2x"] = f2x
-
-    test_ecs = 3
 
     npt.assert_allclose(convert_lambda_to_ecs(-f2x_expected / ecs, **call_kwargs), ecs)
