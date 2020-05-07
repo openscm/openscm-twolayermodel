@@ -1,1 +1,0 @@
-def test_twolayer_defaults(update_expected_files):
