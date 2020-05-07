@@ -22,6 +22,7 @@ REQUIREMENTS = ["openscm-units", "tqdm"]
 REQUIREMENTS_NOTEBOOKS = [
     "ipywidgets",
     "notebook",
+    "scmdata>=0.4.3",
     "seaborn",
 ]
 REQUIREMENTS_TESTS = ["codecov", "coverage", "nbval", "pytest-cov", "pytest>=4.0"]

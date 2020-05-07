@@ -8,3 +8,6 @@ from ._version import get_versions
 
 __version__ = get_versions()["version"]
 del get_versions
+
+from .two_layer_model import TwoLayerModel  # noqa
+from .impulse_response_model import ImpulseResponseModel  # noqa
