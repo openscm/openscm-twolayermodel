@@ -6,25 +6,28 @@ from scmdata import ScmRun
 from test_model_integration_base import ModelIntegrationTester
 
 from openscm_twolayermodel import TwoLayerModel
+from openscm_twolayermodel.errors import UnitError
 
 
 class TestTwoLayerModel(ModelIntegrationTester):
 
     tmodel = TwoLayerModel
 
+    tinp = ScmRun(
+        data=np.linspace(0, 4, 100),
+        index=np.linspace(1750, 1850, 100).astype(int),
+        columns={
+            "scenario": "test_scenario",
+            "model": "unspecified",
+            "climate_model": "junk input",
+            "variable": "Effective Radiative Forcing",
+            "unit": "W/m^2",
+            "region": "World",
+        },
+    )
+
     def test_run_scenarios_single(self):
-        inp = ScmRun(
-            data=np.linspace(0, 4, 100),
-            index=np.linspace(1750, 1850, 100).astype(int),
-            columns={
-                "scenario": "test_scenario",
-                "model": "unspecified",
-                "climate_model": "junk input",
-                "variable": "Effective Radiative Forcing",
-                "unit": "W/m^2",
-                "region": "World",
-            },
-        )
+        inp = self.tinp.copy()
 
         model = self.tmodel()
 
@@ -217,10 +220,54 @@ class TestTwoLayerModel(ModelIntegrationTester):
                 == "W/m^2"
             )
 
+    def test_run_unit_handling(self, check_scmruns_allclose):
+        inp = self.tinp.copy()
+
+        model = self.tmodel()
+
+        res = model.run_scenarios(inp)
+
+        # scmdata bug
+        # inp.convert_unit("kW/m^2") blows up
+        inp_other_unit = inp.copy()
+        inp_other_unit *= 10**-3
+        inp_other_unit.set_meta("kW/m^2", "unit")
+        res_other_unit = model.run_scenarios(inp_other_unit)
+
+        check_scmruns_allclose(
+            res.filter(variable="Effective Radiative Forcing", keep=False),
+            res_other_unit.filter(variable="Effective Radiative Forcing", keep=False)
+        )
+
+    def test_run_wrong_units(self):
+        inp = self.tinp.copy()
+        inp.set_meta("W", "unit")
+
+        model = self.tmodel()
+
+        with pytest.raises(UnitError):
+            model.run_scenarios(inp)
+
+    def test_run_wrong_region(self):
+        inp = self.tinp.copy()
+        inp.set_meta("World|R5LAM", "region")
+
+        model = self.tmodel()
+
+        error_msg = "No World data available for driver_var `Effective Radiative Forcing`"
+
+        with pytest.raises(ValueError, match=error_msg):
+            model.run_scenarios(inp)
+
+    def test_run_wrong_driver(self):
+        inp = self.tinp.copy()
+
+        model = self.tmodel()
+
+        error_msg = "No World data available for driver_var `Effective Radiative Forcing|CO2`"
+
+        with pytest.raises(ValueError, match=error_msg):
+            model.run_scenarios(inp, driver_var="Effective Radiative Forcing|CO2")
 
 # tests:
-# - error if not World
-# - error if bad units
-# - error if variable not correctly pointed to (give option to specify run_variable)
-# - same results even if input units change
 # - test automatically taking timestep from input
