@@ -2,11 +2,30 @@ import numpy as np
 from openscm_units import unit_registry as ur
 
 from .base import Model
+from .errors import ModelStateError
 
 
 class TwoLayerModel(Model):
+    """
+    TODO: top line
+
+    This implementation uses a forward-differencing approach. This means that
+    temperature and ocean heat uptake values are start of timestep values. For
+    example, temperature[i] is only affected by drivers from the i-1 timestep.
+    In practice, this means that the first temperature and ocean heat uptake
+    values will always be zero and the last value in the input drivers has no
+    effect on model output.
+    """
+
+    density_water = 1000 * ur("kg/m^3")
+    """:obj:`pint.Quantity` : density of water"""
+
+    heat_capacity_water = 4181 * ur("J/delta_degC/kg")
+    """:obj:`pint.Quantity` : heat capacity of water"""
 
     _du_unit = "m"
+    _heat_capacity_upper_unit = "J/delta_degC/m^2"
+    _heat_capacity_lower_unit = "J/delta_degC/m^2"
     _dl_unit = "m"
     _lambda_0_unit = "W/m^2/delta_degC"
     _a_unit = "W/m^2/delta_degC^2"
@@ -59,7 +78,10 @@ class TwoLayerModel(Model):
         self.eta = eta
         self.delta_t = delta_t
 
-        self._erf = np.nan
+        self._erf = np.zeros(1) * np.nan
+        self._temp_upper_mag = np.zeros(1) * np.nan
+        self._temp_lower_mag = np.nan
+        self._rndt_mag = np.zeros(1) * np.nan
 
     # must be a better way to handle this property creation...
     @property
@@ -71,6 +93,13 @@ class TwoLayerModel(Model):
         self._check_is_pint_quantity(val, "du", self._du_unit)
         self._du = val
         self._du_mag = val.to(self._du_unit).magnitude
+        self._heat_capacity_upper_mag = self.heat_capacity_upper.to(
+            self._heat_capacity_upper_unit
+        ).magnitude
+
+    @property
+    def heat_capacity_upper(self):
+        return self.du * self.density_water * self.heat_capacity_water
 
     @property
     def dl(self):
@@ -81,6 +110,13 @@ class TwoLayerModel(Model):
         self._check_is_pint_quantity(val, "dl", self._dl_unit)
         self._dl = val
         self._dl_mag = val.to(self._dl_unit).magnitude
+        self._heat_capacity_lower_mag = self.heat_capacity_lower.to(
+            self._heat_capacity_lower_unit
+        ).magnitude
+
+    @property
+    def heat_capacity_lower(self):
+        return self.dl * self.density_water * self.heat_capacity_water
 
     @property
     def lambda_0(self):
@@ -152,3 +188,84 @@ class TwoLayerModel(Model):
             Effective radiative forcing (W/m^2) to use to drive the model
         """
         self.erf = erf
+
+    def _reset(self):
+        if np.isnan(self.erf).any():
+            raise ModelStateError(
+                "The model's drivers have not been set yet, call "
+                ":meth:`self.set_drivers` first."
+            )
+
+        self._timestep_idx = np.nan
+        self._temp_upper_mag = np.zeros_like(self._erf_mag) * np.nan
+        self._temp_lower_mag = np.zeros_like(self._erf_mag) * np.nan
+        self._rndt_mag = np.zeros_like(self._erf_mag) * np.nan
+
+    def _run(self):
+        for _ in self.erf:
+            self.step()
+
+    def _step(self):
+        if np.isnan(self._timestep_idx):
+            self._timestep_idx = 0
+
+        else:
+            self._timestep_idx += 1
+
+        if np.equal(self._timestep_idx, 0):
+            self._temp_upper_mag[self._timestep_idx] = 0.0
+            self._temp_lower_mag[self._timestep_idx] = 0.0
+            self._rndt_mag[self._timestep_idx] = 0.0
+
+        else:
+            self._temp_upper_mag[self._timestep_idx] = self._calculate_next_temp_upper(
+                self._delta_t_mag,
+                self._temp_upper_mag[self._timestep_idx - 1],
+                self._temp_lower_mag[self._timestep_idx - 1],
+                self._erf_mag[self._timestep_idx - 1],
+                self._lambda_0_mag,
+                self._a_mag,
+                self._efficacy_mag,
+                self._eta_mag,
+                self._heat_capacity_upper_mag,
+            )
+
+            self._temp_lower_mag[self._timestep_idx] = self._calculate_next_temp_lower(
+                self._delta_t_mag,
+                self._temp_lower_mag[self._timestep_idx - 1],
+                self._temp_upper_mag[self._timestep_idx - 1],
+                self._eta_mag,
+                self._heat_capacity_lower_mag,
+            )
+
+            self._rndt_mag[self._timestep_idx] = self._calculate_next_rndt(
+                self._delta_t_mag,
+                self._temp_lower_mag[self._timestep_idx],
+                self._temp_lower_mag[self._timestep_idx - 1],
+                self._heat_capacity_lower_mag,
+                self._temp_upper_mag[self._timestep_idx],
+                self._temp_upper_mag[self._timestep_idx - 1],
+                self._heat_capacity_upper_mag,
+            )
+
+    @staticmethod
+    def _calculate_next_temp_upper(delta_t, t_upper, t_lower, erf, lambda_0, a, efficacy, eta, heat_capacity_upper):
+        lambda_now = lambda_0 + a * t_upper
+        heat_exchange = efficacy * eta * (t_upper - t_lower)
+        dT_dt = (erf + lambda_now * t_upper - heat_exchange) / heat_capacity_upper
+
+        return t_upper + delta_t * dT_dt
+
+    @staticmethod
+    def _calculate_next_temp_lower(delta_t, t_lower, t_upper, eta, heat_capacity_lower):
+        heat_exchange = eta * (t_upper - t_lower)
+        dT_dt = heat_exchange / heat_capacity_lower
+
+        return t_lower + delta_t * dT_dt
+
+    @staticmethod
+    def _calculate_next_rndt(delta_t, t_lower_now, t_lower_prev, heat_capacity_lower, t_upper_now, t_upper_prev, heat_capacity_upper):
+        uptake_lower = heat_capacity_lower * (t_lower_now - t_lower_prev) / delta_t
+        uptake_upper = heat_capacity_upper * (t_upper_now - t_upper_prev) / delta_t
+
+        return uptake_upper + uptake_lower

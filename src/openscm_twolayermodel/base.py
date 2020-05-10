@@ -5,6 +5,7 @@ import pint.errors
 
 from .errors import UnitsError
 
+
 class Model:
     @staticmethod
     def _check_is_pint_quantity(quantity, name, model_units):
@@ -21,4 +22,36 @@ class Model:
         """
         Set the model's drivers
         """
+        pass
+
+    def reset(self):
+        """
+        Reset everything so that a new run can be performed.
+
+        Called as late as possible before :meth:`run`.
+        """
+        self._reset()
+
+    @abstractmethod
+    def _reset(self):
+        pass
+
+    def run(self):
+        """
+        Run the model.
+        """
+        self._run()
+
+    @abstractmethod
+    def _run(self):
+        pass
+
+    def step(self):
+        """
+        Do a single time step.
+        """
+        self._step()
+
+    @abstractmethod
+    def _step(self):
         pass
