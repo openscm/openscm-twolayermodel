@@ -1,5 +1,6 @@
 import os.path
 
+import numpy.testing as npt
 import pandas as pd
 import pytest
 from scmdata.run import ScmRun
@@ -90,3 +91,35 @@ def run_model_output_comparison():
             pytest.skip("Updated {}".format(expected))
 
     return _do_comparison
+
+
+# temporary workaround until this is in Pint itself and can be imported
+def assert_pint_equal(a, b, **kwargs):
+    c = b.to(a.units)
+    try:
+        npt.assert_allclose(a.magnitude, c.magnitude, **kwargs)
+
+    except AssertionError as e:
+        original_msg = "{}".format(e)
+        note_line = "Note: values above have been converted to {}".format(a.units)
+        units_lines = "Input units:\n" "x: {}\n" "y: {}".format(a.units, b.units)
+
+        numerical_lines = (
+            "Numerical values with units:\n" "x: {}\n" "y: {}".format(a, b)
+        )
+
+        error_msg = (
+            "{}\n"
+            "\n"
+            "{}\n"
+            "\n"
+            "{}\n"
+            "\n"
+            "{}".format(original_msg, note_line, units_lines, numerical_lines)
+        )
+
+        raise AssertionError(error_msg)
+
+@pytest.fixture
+def check_equal_pint():
+    return assert_pint_equal
