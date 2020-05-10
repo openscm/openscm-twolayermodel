@@ -43,6 +43,8 @@ def test_twolayer_plus_state_dependence(
     twolayer_plus_state_dependence = TwoLayerModel(a=0.05 * ur("W/m^2/delta_degC^2"))
     res = twolayer_plus_state_dependence.run_scenarios(test_rcmip_forcings_scmrun)
 
-    expected = os.path.join(test_twolayer_output_dir, "test_twolayer_plus_state_dependence.csv")
+    expected = os.path.join(
+        test_twolayer_output_dir, "test_twolayer_plus_state_dependence.csv"
+    )
 
     run_model_output_comparison(res, expected, update_expected_files)

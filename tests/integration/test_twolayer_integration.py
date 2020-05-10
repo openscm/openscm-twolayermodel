@@ -228,21 +228,17 @@ class TestTwoLayerModel(ModelIntegrationTester):
         model = self.tmodel()
 
         res = model.run_scenarios(inp)
-        check_equal_pint(
-            model.delta_t,
-            1 * ur("yr")
-        )
+        check_equal_pint(model.delta_t, 1 * ur("yr"))
 
         inp_monthly = inp.resample("MS")
         res_monthly = model.run_scenarios(inp_monthly)
-        check_equal_pint(
-            model.delta_t,
-            1 * ur("month")
-        )
+        check_equal_pint(model.delta_t, 1 * ur("month"))
 
         comp_filter = {
             "variable": "Surface Temperature|Upper",
-            "year": int(res["year"].iloc[-1]),  # scmdata bug that you have to wrap this with int()
+            "year": int(
+                res["year"].iloc[-1]
+            ),  # scmdata bug that you have to wrap this with int()
             "month": 1,
         }
 
@@ -254,7 +250,6 @@ class TestTwoLayerModel(ModelIntegrationTester):
         )
         res.filter(variable="Surface Temperature|Upper")
 
-
     def test_run_unit_handling(self, check_scmruns_allclose):
         inp = self.tinp.copy()
 
@@ -265,13 +260,13 @@ class TestTwoLayerModel(ModelIntegrationTester):
         # scmdata bug
         # inp.convert_unit("kW/m^2") blows up
         inp_other_unit = inp.copy()
-        inp_other_unit *= 10**-3
+        inp_other_unit *= 10 ** -3
         inp_other_unit.set_meta("kW/m^2", "unit")
         res_other_unit = model.run_scenarios(inp_other_unit)
 
         check_scmruns_allclose(
             res.filter(variable="Effective Radiative Forcing", keep=False),
-            res_other_unit.filter(variable="Effective Radiative Forcing", keep=False)
+            res_other_unit.filter(variable="Effective Radiative Forcing", keep=False),
         )
 
     def test_run_wrong_units(self):
@@ -289,7 +284,9 @@ class TestTwoLayerModel(ModelIntegrationTester):
 
         model = self.tmodel()
 
-        error_msg = "No World data available for driver_var `Effective Radiative Forcing`"
+        error_msg = (
+            "No World data available for driver_var `Effective Radiative Forcing`"
+        )
 
         with pytest.raises(ValueError, match=error_msg):
             model.run_scenarios(inp)
@@ -299,7 +296,9 @@ class TestTwoLayerModel(ModelIntegrationTester):
 
         model = self.tmodel()
 
-        error_msg = "No World data available for driver_var `Effective Radiative Forcing|CO2`"
+        error_msg = (
+            "No World data available for driver_var `Effective Radiative Forcing|CO2`"
+        )
 
         with pytest.raises(ValueError, match=error_msg):
             model.run_scenarios(inp, driver_var="Effective Radiative Forcing|CO2")
