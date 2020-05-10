@@ -1,15 +1,15 @@
 import re
-
-from openscm_units import unit_registry as ur
-from test_model_base import ModelTester
+from unittest.mock import MagicMock
 
 import numpy as np
 import numpy.testing as npt
 import pint.errors
 import pytest
+from openscm_units import unit_registry as ur
+from test_model_base import ModelTester
 
 from openscm_twolayermodel import TwoLayerModel
-from openscm_twolayermodel.errors import UnitsError
+from openscm_twolayermodel.errors import ModelStateError, UnitsError
 
 
 class TestTwoLayerModel(ModelTester):
@@ -42,6 +42,39 @@ class TestTwoLayerModel(ModelTester):
             assert getattr(res, k) == v, "{} not set properly".format(k)
 
         assert np.isnan(res.erf)
+        assert np.isnan(res._temp_upper_mag)
+        assert np.isnan(res._temp_lower_mag)
+        assert np.isnan(res._rndt_mag)
+
+    def test_heat_capacity_upper(self, check_equal_pint):
+        model = self.tmodel(du = 50000 * ur("mm"))
+
+        expected = model.du * model.density_water * model.heat_capacity_water
+
+        res = model.heat_capacity_upper
+
+        check_equal_pint(res, expected)
+        assert model._heat_capacity_upper_mag == res.to(model._heat_capacity_upper_unit).magnitude
+
+    def test_heat_capacity_upper_no_setter(self):
+        model = self.tmodel()
+        with pytest.raises(AttributeError, match="can't set attribute"):
+            model.heat_capacity_upper = 4
+
+    def test_heat_capacity_lower(self, check_equal_pint):
+        model = self.tmodel(dl = 2.5 * ur("km"))
+
+        expected = model.dl * model.density_water * model.heat_capacity_water
+
+        res = model.heat_capacity_lower
+
+        check_equal_pint(res, expected)
+        assert model._heat_capacity_lower_mag == res.to(model._heat_capacity_lower_unit).magnitude
+
+    def test_heat_capacity_lower_no_setter(self):
+        model = self.tmodel()
+        with pytest.raises(AttributeError, match="can't set attribute"):
+            model.heat_capacity_lower = 4
 
     def test_set_erf(self, check_equal_pint):
         terf = np.array([0, 1, 2]) * ur("W/m^2")
@@ -58,7 +91,7 @@ class TestTwoLayerModel(ModelTester):
         with pytest.raises(TypeError, match="erf must be a pint.Quantity"):
             res.erf = terf
 
-    def test_init_bad_units(self):
+    def test_init_wrong_units(self):
         helper = self.tmodel()
 
         for parameter in self.parameters.keys():
@@ -73,3 +106,201 @@ class TestTwoLayerModel(ModelTester):
             error_msg = re.escape("Wrong units for `{}`. {}".format(parameter, pint_msg))
             with pytest.raises(UnitsError, match=error_msg):
                 self.tmodel(**{parameter: tinp})
+
+    def test_calculate_next_temp_upper(self):
+        tdelta_t = 30 * 24 * 60 * 60
+        ttemp_upper = 0.1
+        ttemp_lower = 0.2
+        terf = 1.1
+        tlambda_0 = -3.7 / 3
+        ta = 0.02
+        tefficacy = 0.9
+        teta = 0.78
+        theat_capacity_upper = 10**10
+
+        res = self.tmodel._calculate_next_temp_upper(
+            tdelta_t,
+            ttemp_upper,
+            ttemp_lower,
+            terf,
+            tlambda_0,
+            ta,
+            tefficacy,
+            teta,
+            theat_capacity_upper
+        )
+
+        expected = (
+            ttemp_upper
+            + tdelta_t
+            * (
+                terf
+                + (tlambda_0 + ta * ttemp_upper) * ttemp_upper
+                - (tefficacy * teta * (ttemp_upper - ttemp_lower))
+            )
+            / theat_capacity_upper
+        )
+
+        npt.assert_equal(res, expected)
+
+    def test_calculate_next_temp_lower(self):
+        tdelta_t = 30 * 24 * 60 * 60
+        ttemp_upper = 0.1
+        ttemp_lower = 0.2
+        teta = 0.78
+        theat_capacity_lower = 10**8
+
+        res = self.tmodel._calculate_next_temp_lower(
+            tdelta_t,
+            ttemp_lower,
+            ttemp_upper,
+            teta,
+            theat_capacity_lower
+        )
+
+        expected = (
+            ttemp_lower
+            + (
+                tdelta_t
+                * teta * (ttemp_upper - ttemp_lower)
+                / theat_capacity_lower
+            )
+        )
+
+        npt.assert_equal(res, expected)
+
+    def test_calculate_next_rndt(self):
+        tdelta_t = 30 * 24 * 60 * 60
+        ttemp_upper_t = 0.1
+        ttemp_lower_t = 0.2
+        ttemp_upper_t_prev = 0.09
+        ttemp_lower_t_prev = 0.18
+        theat_capacity_upper = 10**10
+        theat_capacity_lower = 10**8
+
+        res = self.tmodel._calculate_next_rndt(
+            tdelta_t,
+            ttemp_lower_t,
+            ttemp_lower_t_prev,
+            theat_capacity_lower,
+            ttemp_upper_t,
+            ttemp_upper_t_prev,
+            theat_capacity_upper,
+        )
+
+        expected = (
+            theat_capacity_upper * (ttemp_upper_t - ttemp_upper_t_prev)
+            + theat_capacity_lower * (ttemp_lower_t - ttemp_lower_t_prev)
+        ) / tdelta_t
+
+        npt.assert_allclose(res, expected)
+
+    def test_step(self):
+        # move to integration tests
+        terf = np.array([3, 4, 5, 6, 7]) * ur("W/m^2")
+
+        model = self.tmodel()
+        model.set_drivers(terf)
+        model.reset()
+
+        model.step()
+        assert model._timestep_idx == 0
+        npt.assert_equal(model._temp_upper_mag[model._timestep_idx], 0)
+        npt.assert_equal(model._temp_lower_mag[model._timestep_idx], 0)
+        npt.assert_equal(model._rndt_mag[model._timestep_idx], 0)
+
+        model.step()
+        model.step()
+        model.step()
+        assert model._timestep_idx == 3
+
+        npt.assert_equal(
+            model._temp_upper_mag[model._timestep_idx],
+            model._calculate_next_temp_upper(
+                model._delta_t_mag,
+                model._temp_upper_mag[model._timestep_idx - 1],
+                model._temp_lower_mag[model._timestep_idx - 1],
+                model._erf_mag[model._timestep_idx - 1],
+                model._lambda_0_mag,
+                model._a_mag,
+                model._efficacy_mag,
+                model._eta_mag,
+                model._heat_capacity_upper_mag,
+            )
+        )
+
+        npt.assert_equal(
+            model._temp_lower_mag[model._timestep_idx],
+            model._calculate_next_temp_lower(
+                model._delta_t_mag,
+                model._temp_lower_mag[model._timestep_idx - 1],
+                model._temp_upper_mag[model._timestep_idx - 1],
+                model._eta_mag,
+                model._heat_capacity_lower_mag,
+            )
+        )
+
+        npt.assert_equal(
+            model._rndt_mag[model._timestep_idx],
+            model._calculate_next_rndt(
+                model._delta_t_mag,
+                model._temp_lower_mag[model._timestep_idx],
+                model._temp_lower_mag[model._timestep_idx - 1],
+                model._heat_capacity_lower_mag,
+                model._temp_upper_mag[model._timestep_idx],
+                model._temp_upper_mag[model._timestep_idx - 1],
+                model._heat_capacity_upper_mag,
+            )
+        )
+
+    def test_reset(self):
+        terf = np.array([0, 1, 2]) * ur("W/m^2")
+
+        model = self.tmodel()
+        model.set_drivers(terf)
+
+        def assert_is_nan_and_erf_shape(inp):
+            assert np.isnan(inp).all()
+            assert inp.shape == terf.shape
+
+        model.reset()
+        # after reset, we are not in any timestep
+        assert np.isnan(model._timestep_idx)
+        assert_is_nan_and_erf_shape(model._temp_upper_mag)
+        assert_is_nan_and_erf_shape(model._temp_lower_mag)
+        assert_is_nan_and_erf_shape(model._rndt_mag)
+
+    def test_reset_run_reset(self):
+        # move to integration tests
+        terf = np.array([0, 1, 2, 3, 4, 5]) * ur("W/m^2")
+
+        model = self.tmodel()
+        model.set_drivers(terf)
+
+        def assert_is_nan_and_erf_shape(inp):
+            assert np.isnan(inp).all()
+            assert inp.shape == terf.shape
+
+        model.reset()
+        assert_is_nan_and_erf_shape(model._temp_upper_mag)
+        assert_is_nan_and_erf_shape(model._temp_lower_mag)
+        assert_is_nan_and_erf_shape(model._rndt_mag)
+
+        def assert_ge_zero_and_erf_shape(inp):
+            assert not (inp < 0).any()
+            assert inp.shape == terf.shape
+
+        model.run()
+        assert_ge_zero_and_erf_shape(model._temp_upper_mag)
+        assert_ge_zero_and_erf_shape(model._temp_lower_mag)
+        assert_ge_zero_and_erf_shape(model._rndt_mag)
+
+        model.reset()
+        assert_is_nan_and_erf_shape(model._temp_upper_mag)
+        assert_is_nan_and_erf_shape(model._temp_lower_mag)
+        assert_is_nan_and_erf_shape(model._rndt_mag)
+
+    def test_reset_not_set_error(self):
+        error_msg = "The model's drivers have not been set yet, call :meth:`self.set_drivers` first."
+        with pytest.raises(ModelStateError, match=error_msg):
+            self.tmodel().reset()

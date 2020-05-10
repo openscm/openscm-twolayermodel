@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from unittest.mock import MagicMock
 
 import pytest
 from openscm_units import unit_registry as ur
@@ -27,7 +28,7 @@ class ModelTester(ABC):
                 self.tmodel(**{parameter: 34.3})
 
     @abstractmethod
-    def test_init_bad_units(self):
+    def test_init_wrong_units(self):
         """
         Test error thrown if the model is initiliased with wrong units
         for a quantity
@@ -37,3 +38,11 @@ class ModelTester(ABC):
             error_msg = "{} units must be {}".format(parameter, parameter.units)
             with pytest.raises(TypeError, match=error_msg):
                 self.tmodel(**{parameter: 34.3 * ur("kg")})
+
+    def test_run(self):
+        test = self.tmodel()
+        test.step = MagicMock()
+        test.run()
+
+        test.step.assert_called()
+
