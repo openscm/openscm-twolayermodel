@@ -1,8 +1,8 @@
 import numpy as np
 import pint.errors
 from openscm_units import unit_registry as ur
-from scmdata.timeseries import TimeSeries
 from scmdata.run import ScmRun
+from scmdata.timeseries import TimeSeries
 
 from .base import Model
 from .errors import ModelStateError, UnitError
@@ -50,7 +50,7 @@ class TwoLayerModel(Model):
         a=0.0 * ur("W/m^2/delta_degC^2"),
         efficacy=1.0 * ur("dimensionless"),
         eta=0.8 * ur("W/m^2/delta_degC"),
-        delta_t=ur("yr").to("s")
+        delta_t=ur("yr").to("s"),
     ):
         """
         Initialise
@@ -260,7 +260,9 @@ class TwoLayerModel(Model):
             )
 
     @staticmethod
-    def _calculate_next_temp_upper(delta_t, t_upper, t_lower, erf, lambda_0, a, efficacy, eta, heat_capacity_upper):
+    def _calculate_next_temp_upper(
+        delta_t, t_upper, t_lower, erf, lambda_0, a, efficacy, eta, heat_capacity_upper
+    ):
         lambda_now = lambda_0 + a * t_upper
         heat_exchange = efficacy * eta * (t_upper - t_lower)
         dT_dt = (erf + lambda_now * t_upper - heat_exchange) / heat_capacity_upper
@@ -275,7 +277,15 @@ class TwoLayerModel(Model):
         return t_lower + delta_t * dT_dt
 
     @staticmethod
-    def _calculate_next_rndt(delta_t, t_lower_now, t_lower_prev, heat_capacity_lower, t_upper_now, t_upper_prev, heat_capacity_upper):
+    def _calculate_next_rndt(
+        delta_t,
+        t_lower_now,
+        t_lower_prev,
+        heat_capacity_lower,
+        t_upper_now,
+        t_upper_prev,
+        heat_capacity_upper,
+    ):
         uptake_lower = heat_capacity_lower * (t_lower_now - t_lower_prev) / delta_t
         uptake_upper = heat_capacity_upper * (t_upper_now - t_upper_prev) / delta_t
 
@@ -317,24 +327,30 @@ class TwoLayerModel(Model):
             self.run()
 
             out_ts.append(ts)
-            out_ts.append(self._create_ts(
-                base=ts,
-                unit=self._temp_upper_unit,
-                variable="Surface Temperature|Upper",
-                values=self._temp_upper_mag,
-            ))
-            out_ts.append(self._create_ts(
-                base=ts,
-                unit=self._temp_lower_unit,
-                variable="Surface Temperature|Lower",
-                values=self._temp_lower_mag,
-            ))
-            out_ts.append(self._create_ts(
-                base=ts,
-                unit=self._rndt_unit,
-                variable="Heat Uptake",
-                values=self._rndt_mag,
-            ))
+            out_ts.append(
+                self._create_ts(
+                    base=ts,
+                    unit=self._temp_upper_unit,
+                    variable="Surface Temperature|Upper",
+                    values=self._temp_upper_mag,
+                )
+            )
+            out_ts.append(
+                self._create_ts(
+                    base=ts,
+                    unit=self._temp_lower_unit,
+                    variable="Surface Temperature|Lower",
+                    values=self._temp_lower_mag,
+                )
+            )
+            out_ts.append(
+                self._create_ts(
+                    base=ts,
+                    unit=self._rndt_unit,
+                    variable="Heat Uptake",
+                    values=self._rndt_mag,
+                )
+            )
 
         # TODO: ask Jared how we can handle this better
         out = driver.copy()

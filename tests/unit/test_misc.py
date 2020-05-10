@@ -19,11 +19,10 @@ def test_pint_array_comparison():
         assert_pint_equal(a, b)
 
 
-@pytest.mark.parametrize("unit_1,unit_2,error", (
-    ("g", "kg", True),
-    ("W", "J/yr", True),
-    ("W", "J/s", False),
-))
+@pytest.mark.parametrize(
+    "unit_1,unit_2,error",
+    (("g", "kg", True), ("W", "J/yr", True), ("W", "J/s", False),),
+)
 @pytest.mark.parametrize("unit_1_type", (str, "pint_unit"))
 @pytest.mark.parametrize("unit_2_type", (str, "pint_unit"))
 def test_assert_same_unit(unit_1, unit_2, error, unit_1_type, unit_2_type):

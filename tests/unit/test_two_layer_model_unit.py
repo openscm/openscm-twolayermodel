@@ -22,7 +22,7 @@ class TestTwoLayerModel(ModelTester):
         a=0.01 * ur("W/m^2/delta_degC^2"),
         efficacy=1.1 * ur("dimensionless"),
         eta=0.7 * ur("W/m^2/delta_degC"),
-        delta_t=1 * ur("yr")
+        delta_t=1 * ur("yr"),
     )
 
     def test_init(self):
@@ -33,7 +33,7 @@ class TestTwoLayerModel(ModelTester):
             a=0.1 * ur("W/m^2/delta_degC^2"),
             efficacy=1.1 * ur("dimensionless"),
             eta=0.7 * ur("W/m^2/delta_degC"),
-            delta_t=1/12 * ur("yr")
+            delta_t=1 / 12 * ur("yr"),
         )
 
         res = self.tmodel(**init_kwargs)
@@ -47,14 +47,17 @@ class TestTwoLayerModel(ModelTester):
         assert np.isnan(res._rndt_mag)
 
     def test_heat_capacity_upper(self, check_equal_pint):
-        model = self.tmodel(du = 50000 * ur("mm"))
+        model = self.tmodel(du=50000 * ur("mm"))
 
         expected = model.du * model.density_water * model.heat_capacity_water
 
         res = model.heat_capacity_upper
 
         check_equal_pint(res, expected)
-        assert model._heat_capacity_upper_mag == res.to(model._heat_capacity_upper_unit).magnitude
+        assert (
+            model._heat_capacity_upper_mag
+            == res.to(model._heat_capacity_upper_unit).magnitude
+        )
 
     def test_heat_capacity_upper_no_setter(self):
         model = self.tmodel()
@@ -62,14 +65,17 @@ class TestTwoLayerModel(ModelTester):
             model.heat_capacity_upper = 4
 
     def test_heat_capacity_lower(self, check_equal_pint):
-        model = self.tmodel(dl = 2.5 * ur("km"))
+        model = self.tmodel(dl=2.5 * ur("km"))
 
         expected = model.dl * model.density_water * model.heat_capacity_water
 
         res = model.heat_capacity_lower
 
         check_equal_pint(res, expected)
-        assert model._heat_capacity_lower_mag == res.to(model._heat_capacity_lower_unit).magnitude
+        assert (
+            model._heat_capacity_lower_mag
+            == res.to(model._heat_capacity_lower_unit).magnitude
+        )
 
     def test_heat_capacity_lower_no_setter(self):
         model = self.tmodel()
@@ -103,7 +109,9 @@ class TestTwoLayerModel(ModelTester):
             except pint.errors.DimensionalityError as e:
                 pint_msg = str(e)
 
-            error_msg = re.escape("Wrong units for `{}`. {}".format(parameter, pint_msg))
+            error_msg = re.escape(
+                "Wrong units for `{}`. {}".format(parameter, pint_msg)
+            )
             with pytest.raises(UnitError, match=error_msg):
                 self.tmodel(**{parameter: tinp})
 
@@ -116,7 +124,7 @@ class TestTwoLayerModel(ModelTester):
         ta = 0.02
         tefficacy = 0.9
         teta = 0.78
-        theat_capacity_upper = 10**10
+        theat_capacity_upper = 10 ** 10
 
         res = self.tmodel._calculate_next_temp_upper(
             tdelta_t,
@@ -127,7 +135,7 @@ class TestTwoLayerModel(ModelTester):
             ta,
             tefficacy,
             teta,
-            theat_capacity_upper
+            theat_capacity_upper,
         )
 
         expected = (
@@ -146,22 +154,42 @@ class TestTwoLayerModel(ModelTester):
         # check internal units make sense
         check_same_unit(
             self.tmodel._lambda_0_unit,
-            (1.0 * ur(self.tmodel._a_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+            (
+                1.0 * ur(self.tmodel._a_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)
+            ).units,
         )
 
         check_same_unit(
             self.tmodel._erf_unit,
-            (1.0 * ur(self.tmodel._lambda_0_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+            (
+                1.0
+                * ur(self.tmodel._lambda_0_unit)
+                * 1.0
+                * ur(self.tmodel._temp_upper_unit)
+            ).units,
         )
 
         check_same_unit(
             self.tmodel._erf_unit,
-            (1.0 * ur(self.tmodel._efficacy_unit) * 1.0 * ur(self.tmodel._eta_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+            (
+                1.0
+                * ur(self.tmodel._efficacy_unit)
+                * 1.0
+                * ur(self.tmodel._eta_unit)
+                * 1.0
+                * ur(self.tmodel._temp_upper_unit)
+            ).units,
         )
 
         check_same_unit(
             self.tmodel._temp_upper_unit,
-            (1.0 * ur(self.tmodel._delta_t_unit) * 1.0 * ur(self.tmodel._erf_unit) / (1.0 * ur(self.tmodel._heat_capacity_upper_unit))).units
+            (
+                1.0
+                * ur(self.tmodel._delta_t_unit)
+                * 1.0
+                * ur(self.tmodel._erf_unit)
+                / (1.0 * ur(self.tmodel._heat_capacity_upper_unit))
+            ).units,
         )
 
     def test_calculate_next_temp_lower(self, check_same_unit):
@@ -169,35 +197,33 @@ class TestTwoLayerModel(ModelTester):
         ttemp_upper = 0.1
         ttemp_lower = 0.2
         teta = 0.78
-        theat_capacity_lower = 10**8
+        theat_capacity_lower = 10 ** 8
 
         res = self.tmodel._calculate_next_temp_lower(
-            tdelta_t,
-            ttemp_lower,
-            ttemp_upper,
-            teta,
-            theat_capacity_lower
+            tdelta_t, ttemp_lower, ttemp_upper, teta, theat_capacity_lower
         )
 
-        expected = (
-            ttemp_lower
-            + (
-                tdelta_t
-                * teta * (ttemp_upper - ttemp_lower)
-                / theat_capacity_lower
-            )
+        expected = ttemp_lower + (
+            tdelta_t * teta * (ttemp_upper - ttemp_lower) / theat_capacity_lower
         )
 
         npt.assert_equal(res, expected)
 
         # check internal units make sense
         check_same_unit(
-            self.tmodel._temp_upper_unit,
-            self.tmodel._temp_lower_unit,
+            self.tmodel._temp_upper_unit, self.tmodel._temp_lower_unit,
         )
         check_same_unit(
             self.tmodel._temp_lower_unit,
-            (1.0 * ur(self.tmodel._delta_t_unit) * 1.0 * ur(self.tmodel._eta_unit) * 1.0 * ur(self.tmodel._temp_upper_unit) / (1.0 * ur(self.tmodel._heat_capacity_upper_unit))).units
+            (
+                1.0
+                * ur(self.tmodel._delta_t_unit)
+                * 1.0
+                * ur(self.tmodel._eta_unit)
+                * 1.0
+                * ur(self.tmodel._temp_upper_unit)
+                / (1.0 * ur(self.tmodel._heat_capacity_upper_unit))
+            ).units,
         )
 
     def test_calculate_next_rndt(self, check_same_unit):
@@ -206,8 +232,8 @@ class TestTwoLayerModel(ModelTester):
         ttemp_lower_t = 0.2
         ttemp_upper_t_prev = 0.09
         ttemp_lower_t_prev = 0.18
-        theat_capacity_upper = 10**10
-        theat_capacity_lower = 10**8
+        theat_capacity_upper = 10 ** 10
+        theat_capacity_lower = 10 ** 8
 
         res = self.tmodel._calculate_next_rndt(
             tdelta_t,
@@ -228,16 +254,33 @@ class TestTwoLayerModel(ModelTester):
 
         # check internal units make sense
         check_same_unit(
-            self.tmodel._temp_upper_unit,
-            self.tmodel._temp_lower_unit,
+            self.tmodel._temp_upper_unit, self.tmodel._temp_lower_unit,
         )
         check_same_unit(
-            ((1.0 * ur(self.tmodel._heat_capacity_lower_unit) * 1.0 * ur(self.tmodel._temp_lower_unit)).units),
-            (1.0 * ur(self.tmodel._heat_capacity_upper_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+            (
+                (
+                    1.0
+                    * ur(self.tmodel._heat_capacity_lower_unit)
+                    * 1.0
+                    * ur(self.tmodel._temp_lower_unit)
+                ).units
+            ),
+            (
+                1.0
+                * ur(self.tmodel._heat_capacity_upper_unit)
+                * 1.0
+                * ur(self.tmodel._temp_upper_unit)
+            ).units,
         )
         check_same_unit(
             self.tmodel._rndt_unit,
-            (1.0 * ur(self.tmodel._heat_capacity_upper_unit) * 1.0 * ur(self.tmodel._temp_upper_unit) / (1.0 * ur(self.tmodel._delta_t_unit))).units
+            (
+                1.0
+                * ur(self.tmodel._heat_capacity_upper_unit)
+                * 1.0
+                * ur(self.tmodel._temp_upper_unit)
+                / (1.0 * ur(self.tmodel._delta_t_unit))
+            ).units,
         )
 
     def test_step(self):
@@ -271,7 +314,7 @@ class TestTwoLayerModel(ModelTester):
                 model._efficacy_mag,
                 model._eta_mag,
                 model._heat_capacity_upper_mag,
-            )
+            ),
         )
 
         npt.assert_equal(
@@ -282,7 +325,7 @@ class TestTwoLayerModel(ModelTester):
                 model._temp_upper_mag[model._timestep_idx - 1],
                 model._eta_mag,
                 model._heat_capacity_lower_mag,
-            )
+            ),
         )
 
         npt.assert_equal(
@@ -295,7 +338,7 @@ class TestTwoLayerModel(ModelTester):
                 model._temp_upper_mag[model._timestep_idx],
                 model._temp_upper_mag[model._timestep_idx - 1],
                 model._heat_capacity_upper_mag,
-            )
+            ),
         )
 
     def test_reset(self):
