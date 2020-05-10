@@ -1,7 +1,6 @@
 import os.path
 
 from openscm_units import unit_registry as ur
-from scmdata.run import ScmRun
 
 from openscm_twolayermodel import TwoLayerModel
 

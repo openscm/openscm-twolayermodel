@@ -1,4 +1,7 @@
-from abc import abstractmethod
+"""
+Module containing the base for model implementations
+"""
+from abc import ABC, abstractmethod
 
 import pint
 import pint.errors
@@ -6,7 +9,11 @@ import pint.errors
 from .errors import UnitError
 
 
-class Model:
+class Model(ABC):
+    """
+    Base class for model implementations
+    """
+
     @staticmethod
     def _check_is_pint_quantity(quantity, name, model_units):
         if not isinstance(quantity, pint.Quantity):
@@ -14,15 +21,14 @@ class Model:
 
         try:
             quantity.to(model_units)
-        except pint.errors.DimensionalityError as e:
-            raise UnitError("Wrong units for `{}`. {}".format(name, e))
+        except pint.errors.DimensionalityError as exc:
+            raise UnitError("Wrong units for `{}`. {}".format(name, exc))
 
     @abstractmethod
     def set_drivers(self, *args, **kwargs):
         """
         Set the model's drivers
         """
-        pass
 
     def reset(self):
         """

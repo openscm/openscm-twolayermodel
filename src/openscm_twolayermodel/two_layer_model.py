@@ -1,18 +1,22 @@
+"""
+Module containing the two-layer model
+"""
 import numpy as np
 import pandas as pd
-import pint.errors
 import tqdm.autonotebook as tqdman
 from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
 from scmdata.timeseries import TimeSeries
 
 from .base import Model
-from .errors import ModelStateError, UnitError
+from .errors import ModelStateError
+
+# pylint: disable=invalid-name
 
 
-class TwoLayerModel(Model):
+class TwoLayerModel(Model):  # pylint: disable=too-many-instance-attributes
     """
-    TODO: top line
+    TODO: top line and paper references
 
     This implementation uses a forward-differencing approach. This means that
     temperature and ocean heat uptake values are start of timestep values. For
@@ -53,7 +57,7 @@ class TwoLayerModel(Model):
         efficacy=1.0 * ur("dimensionless"),
         eta=0.8 * ur("W/m^2/delta_degC"),
         delta_t=ur("yr").to("s"),
-    ):
+    ):  # pylint: disable=too-many-arguments
         """
         Initialise
         """
@@ -204,7 +208,9 @@ class TwoLayerModel(Model):
         self._erf = val
         self._erf_mag = val.to(self._erf_unit).magnitude
 
-    def set_drivers(self, erf):
+    def set_drivers(
+        self, erf
+    ):  # pylint: disable=arguments-differ # hmm need to think about this
         """
         Set drivers for a model run
 
@@ -212,6 +218,11 @@ class TwoLayerModel(Model):
         ----------
         erf : :obj:`pint.Quantity`
             Effective radiative forcing (W/m^2) to use to drive the model
+
+        Raises
+        ------
+        AssertionError
+            ``erf`` is not one-dimensional
         """
         if len(erf.shape) != 1:
             raise AssertionError("erf must be one-dimensional")
@@ -278,7 +289,7 @@ class TwoLayerModel(Model):
             )
 
     @staticmethod
-    def _calculate_next_temp_upper(
+    def _calculate_next_temp_upper(  # pylint: disable=too-many-arguments
         delta_t, t_upper, t_lower, erf, lambda_0, a, efficacy, eta, heat_capacity_upper
     ):
         lambda_now = lambda_0 + a * t_upper
@@ -288,14 +299,16 @@ class TwoLayerModel(Model):
         return t_upper + delta_t * dT_dt
 
     @staticmethod
-    def _calculate_next_temp_lower(delta_t, t_lower, t_upper, eta, heat_capacity_lower):
+    def _calculate_next_temp_lower(
+        delta_t, t_lower, t_upper, eta, heat_capacity_lower
+    ):  # pylint: disable=too-many-arguments
         heat_exchange = eta * (t_upper - t_lower)
         dT_dt = heat_exchange / heat_capacity_lower
 
         return t_lower + delta_t * dT_dt
 
     @staticmethod
-    def _calculate_next_rndt(
+    def _calculate_next_rndt(  # pylint: disable=too-many-arguments
         delta_t,
         t_lower_now,
         t_lower_prev,
@@ -331,6 +344,12 @@ class TwoLayerModel(Model):
         -------
         :obj:`ScmRun`
             Results of the run (including drivers)
+
+        Raises
+        ------
+        ValueError
+            No data is available for ``driver_var`` in the ``"World"`` region in
+            ``scenarios``.
         """
         # TODO: put something like this in base
         if not isinstance(scenarios, ScmRun):
@@ -364,7 +383,7 @@ class TwoLayerModel(Model):
         timestep = self._select_timestep(driver)
         self.delta_t = timestep
 
-        out = []
+        run_store = list()
 
         driver_ts = driver.timeseries()
         for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows())):
@@ -411,9 +430,9 @@ class TwoLayerModel(Model):
             out_run._ts = out_run_tss
             out_run = ScmRun(out_run.timeseries())
             out_run.set_meta(i, "run_idx")
-            out.append(out_run)
+            run_store.append(out_run)
 
-        idx = out[0].meta.columns.tolist()
+        idx = run_store[0].meta.columns.tolist()
 
         def get_ordered_timeseries(in_ts):
             in_ts = in_ts.reorder_levels(idx)
@@ -421,7 +440,9 @@ class TwoLayerModel(Model):
             return in_ts
 
         out = ScmRun(
-            pd.concat([get_ordered_timeseries(r.timeseries()) for r in out], axis=0)
+            pd.concat(
+                [get_ordered_timeseries(r.timeseries()) for r in run_store], axis=0
+            )
         )
 
         return out
