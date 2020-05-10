@@ -359,6 +359,9 @@ class TwoLayerModel(Model):
         for k, v in save_paras_meta.items():
             driver.set_meta(v, k)
 
+        timestep = self._select_timestep(driver)
+        self.delta_t = timestep
+
         out = []
 
         driver_ts = driver.timeseries()
@@ -427,3 +430,23 @@ class TwoLayerModel(Model):
         out[:] = values
 
         return out
+
+    @staticmethod
+    def _select_timestep(driver):
+        year_diff = driver["year"].diff().dropna()
+        if (year_diff == 1).all():
+            # assume yearly timesteps
+            return 1 * ur("yr")
+
+        time_diff = driver["time"].diff().dropna()
+        if all(np.logical_and(
+            time_diff <= np.timedelta64(31, 'D'),
+            time_diff >= np.timedelta64(28, 'D'),
+        )):
+            # Assume constant monthly timesteps. This is clearly an approximation but
+            # while we have constant internal timesteps it's the best we can do.
+            return 1 * ur("month")
+
+        raise NotImplementedError(
+            "Could not decide on timestep for time axis: {}".format(driver["time"])
+        )
