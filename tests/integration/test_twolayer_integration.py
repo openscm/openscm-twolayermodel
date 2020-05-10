@@ -1,3 +1,5 @@
+import datetime as dt
+
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -14,8 +16,8 @@ class TestTwoLayerModel(ModelIntegrationTester):
     tmodel = TwoLayerModel
 
     tinp = ScmRun(
-        data=np.linspace(0, 4, 100),
-        index=np.linspace(1750, 1850, 100).astype(int),
+        data=np.linspace(0, 4, 101),
+        index=np.linspace(1750, 1850, 101).astype(int),
         columns={
             "scenario": "test_scenario",
             "model": "unspecified",
@@ -72,12 +74,12 @@ class TestTwoLayerModel(ModelIntegrationTester):
         )
 
     def test_run_scenarios_multiple(self):
-        ts1_erf = np.linspace(0, 4, 100)
-        ts2_erf = np.sin(np.linspace(0, 4, 100))
+        ts1_erf = np.linspace(0, 4, 101)
+        ts2_erf = np.sin(np.linspace(0, 4, 101))
 
         inp = ScmRun(
             data=np.vstack([ts1_erf, ts2_erf]).T,
-            index=np.linspace(1750, 1850, 100).astype(int),
+            index=np.linspace(1750, 1850, 101).astype(int),
             columns={
                 "scenario": ["test_scenario_1", "test_scenario_2"],
                 "model": "unspecified",
@@ -142,14 +144,14 @@ class TestTwoLayerModel(ModelIntegrationTester):
         ("Effective Radiative Forcing", "Effective Radiative Forcing|CO2",),
     )
     def test_run_scenarios_multiple_drive_var(self, driver_var):
-        ts1_erf = np.linspace(0, 4, 100)
+        ts1_erf = np.linspace(0, 4, 101)
         ts1_erf_co2 = 0.9 * ts1_erf
-        ts2_erf = np.sin(np.linspace(0, 4, 100))
-        ts2_erf_co2 = np.cos(np.linspace(0, 4, 100)) * ts2_erf
+        ts2_erf = np.sin(np.linspace(0, 4, 101))
+        ts2_erf_co2 = np.cos(np.linspace(0, 4, 101)) * ts2_erf
 
         inp = ScmRun(
             data=np.vstack([ts1_erf, ts1_erf_co2, ts2_erf, ts2_erf_co2]).T,
-            index=np.linspace(1750, 1850, 100).astype(int),
+            index=np.linspace(1750, 1850, 101).astype(int),
             columns={
                 "scenario": [
                     "test_scenario_1",
@@ -220,6 +222,39 @@ class TestTwoLayerModel(ModelIntegrationTester):
                 == "W/m^2"
             )
 
+    def test_run_scenario_timestep_followed(self, check_equal_pint):
+        inp = self.tinp.copy()
+
+        model = self.tmodel()
+
+        res = model.run_scenarios(inp)
+        check_equal_pint(
+            model.delta_t,
+            1 * ur("yr")
+        )
+
+        inp_monthly = inp.resample("MS")
+        res_monthly = model.run_scenarios(inp_monthly)
+        check_equal_pint(
+            model.delta_t,
+            1 * ur("month")
+        )
+
+        comp_filter = {
+            "variable": "Surface Temperature|Upper",
+            "year": int(res["year"].iloc[-1]),  # scmdata bug that you have to wrap this with int()
+            "month": 1,
+        }
+
+        # running with two different timesteps should give approximately same results
+        npt.assert_allclose(
+            res.filter(**comp_filter).values.squeeze(),
+            res_monthly.filter(**comp_filter).values.squeeze(),
+            rtol=1e-3,
+        )
+        res.filter(variable="Surface Temperature|Upper")
+
+
     def test_run_unit_handling(self, check_scmruns_allclose):
         inp = self.tinp.copy()
 
@@ -268,6 +303,3 @@ class TestTwoLayerModel(ModelIntegrationTester):
 
         with pytest.raises(ValueError, match=error_msg):
             model.run_scenarios(inp, driver_var="Effective Radiative Forcing|CO2")
-
-# tests:
-# - test automatically taking timestep from input
