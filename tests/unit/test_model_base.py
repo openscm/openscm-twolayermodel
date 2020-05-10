@@ -34,8 +34,8 @@ class ModelTester(ABC):
         for a quantity
         """
         # e.g.
-        for parameter in self.parameters.keys():
-            error_msg = "{} units must be {}".format(parameter, parameter.units)
+        for parameter, value in self.parameters.items():
+            error_msg = "{} units must be {}".format(parameter, value.units)
             with pytest.raises(TypeError, match=error_msg):
                 self.tmodel(**{parameter: 34.3 * ur("kg")})
 

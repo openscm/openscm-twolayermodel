@@ -9,7 +9,7 @@ from openscm_units import unit_registry as ur
 from test_model_base import ModelTester
 
 from openscm_twolayermodel import TwoLayerModel
-from openscm_twolayermodel.errors import ModelStateError, UnitsError
+from openscm_twolayermodel.errors import ModelStateError, UnitError
 
 
 class TestTwoLayerModel(ModelTester):
@@ -21,7 +21,7 @@ class TestTwoLayerModel(ModelTester):
         lambda_0=-3.4 / 3 * ur("W/m^2/delta_degC"),
         a=0.01 * ur("W/m^2/delta_degC^2"),
         efficacy=1.1 * ur("dimensionless"),
-        eta=0.7 * ur("W/m^2/K"),
+        eta=0.7 * ur("W/m^2/delta_degC"),
         delta_t=1 * ur("yr")
     )
 
@@ -32,7 +32,7 @@ class TestTwoLayerModel(ModelTester):
             lambda_0=-4 / 3 * ur("W/m^2/delta_degC"),
             a=0.1 * ur("W/m^2/delta_degC^2"),
             efficacy=1.1 * ur("dimensionless"),
-            eta=0.7 * ur("W/m^2/K"),
+            eta=0.7 * ur("W/m^2/delta_degC"),
             delta_t=1/12 * ur("yr")
         )
 
@@ -104,10 +104,10 @@ class TestTwoLayerModel(ModelTester):
                 pint_msg = str(e)
 
             error_msg = re.escape("Wrong units for `{}`. {}".format(parameter, pint_msg))
-            with pytest.raises(UnitsError, match=error_msg):
+            with pytest.raises(UnitError, match=error_msg):
                 self.tmodel(**{parameter: tinp})
 
-    def test_calculate_next_temp_upper(self):
+    def test_calculate_next_temp_upper(self, check_same_unit):
         tdelta_t = 30 * 24 * 60 * 60
         ttemp_upper = 0.1
         ttemp_lower = 0.2
@@ -143,7 +143,28 @@ class TestTwoLayerModel(ModelTester):
 
         npt.assert_equal(res, expected)
 
-    def test_calculate_next_temp_lower(self):
+        # check internal units make sense
+        check_same_unit(
+            self.tmodel._lambda_0_unit,
+            (1.0 * ur(self.tmodel._a_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+        )
+
+        check_same_unit(
+            self.tmodel._erf_unit,
+            (1.0 * ur(self.tmodel._lambda_0_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+        )
+
+        check_same_unit(
+            self.tmodel._erf_unit,
+            (1.0 * ur(self.tmodel._efficacy_unit) * 1.0 * ur(self.tmodel._eta_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+        )
+
+        check_same_unit(
+            self.tmodel._temp_upper_unit,
+            (1.0 * ur(self.tmodel._delta_t_unit) * 1.0 * ur(self.tmodel._erf_unit) / (1.0 * ur(self.tmodel._heat_capacity_upper_unit))).units
+        )
+
+    def test_calculate_next_temp_lower(self, check_same_unit):
         tdelta_t = 30 * 24 * 60 * 60
         ttemp_upper = 0.1
         ttemp_lower = 0.2
@@ -169,7 +190,17 @@ class TestTwoLayerModel(ModelTester):
 
         npt.assert_equal(res, expected)
 
-    def test_calculate_next_rndt(self):
+        # check internal units make sense
+        check_same_unit(
+            self.tmodel._temp_upper_unit,
+            self.tmodel._temp_lower_unit,
+        )
+        check_same_unit(
+            self.tmodel._temp_lower_unit,
+            (1.0 * ur(self.tmodel._delta_t_unit) * 1.0 * ur(self.tmodel._eta_unit) * 1.0 * ur(self.tmodel._temp_upper_unit) / (1.0 * ur(self.tmodel._heat_capacity_upper_unit))).units
+        )
+
+    def test_calculate_next_rndt(self, check_same_unit):
         tdelta_t = 30 * 24 * 60 * 60
         ttemp_upper_t = 0.1
         ttemp_lower_t = 0.2
@@ -194,6 +225,20 @@ class TestTwoLayerModel(ModelTester):
         ) / tdelta_t
 
         npt.assert_allclose(res, expected)
+
+        # check internal units make sense
+        check_same_unit(
+            self.tmodel._temp_upper_unit,
+            self.tmodel._temp_lower_unit,
+        )
+        check_same_unit(
+            ((1.0 * ur(self.tmodel._heat_capacity_lower_unit) * 1.0 * ur(self.tmodel._temp_lower_unit)).units),
+            (1.0 * ur(self.tmodel._heat_capacity_upper_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)).units
+        )
+        check_same_unit(
+            self.tmodel._rndt_unit,
+            (1.0 * ur(self.tmodel._heat_capacity_upper_unit) * 1.0 * ur(self.tmodel._temp_upper_unit) / (1.0 * ur(self.tmodel._delta_t_unit))).units
+        )
 
     def test_step(self):
         # move to integration tests

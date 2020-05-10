@@ -1,8 +1,10 @@
 import os.path
 
+import numpy as np
 import numpy.testing as npt
 import pandas as pd
 import pytest
+from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
 
 TEST_DATA_ROOT_DIR = os.path.join(
@@ -123,3 +125,16 @@ def assert_pint_equal(a, b, **kwargs):
 @pytest.fixture
 def check_equal_pint():
     return assert_pint_equal
+
+
+# temporary workaround until this is in Pint itself and can be imported
+def assert_same_unit(unit_1, unit_2):
+    """
+    Check that conversion factor between two units is 1
+    """
+    assert np.equal(1 * ur(str(unit_1)).to(unit_2).magnitude, 1)
+
+
+@pytest.fixture
+def check_same_unit():
+    return assert_same_unit
