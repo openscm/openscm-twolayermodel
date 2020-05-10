@@ -195,6 +195,9 @@ class TwoLayerModel(Model):
         erf : :obj:`pint.Quantity`
             Effective radiative forcing (W/m^2) to use to drive the model
         """
+        if len(erf.shape) != 1:
+            raise AssertionError("erf must be one-dimensional")
+
         self.erf = erf
 
     def _reset(self):
@@ -304,6 +307,7 @@ class TwoLayerModel(Model):
             driver = scenarios.copy()
 
         driver = driver.filter(variable=driver_var)
+        driver.set_meta("two_layer", "climate_model")
 
         out_ts = []
         # TODO: ask Jared if there's a way to do this without accessing private method
@@ -313,12 +317,37 @@ class TwoLayerModel(Model):
             self.run()
 
             out_ts.append(ts)
-            temp_upper_ts = ts.copy()
-            temp_upper_ts.meta["unit"] = self._temp_upper_unit
+            out_ts.append(self._create_ts(
+                base=ts,
+                unit=self._temp_upper_unit,
+                variable="Surface Temperature|Upper",
+                values=self._temp_upper_mag,
+            ))
+            out_ts.append(self._create_ts(
+                base=ts,
+                unit=self._temp_lower_unit,
+                variable="Surface Temperature|Lower",
+                values=self._temp_lower_mag,
+            ))
+            out_ts.append(self._create_ts(
+                base=ts,
+                unit=self._rndt_unit,
+                variable="Heat Uptake",
+                values=self._rndt_mag,
+            ))
 
         # TODO: ask Jared how we can handle this better
         out = driver.copy()
         out._ts = out_ts
         out = ScmRun(out.timeseries())
+
+        return out
+
+    @staticmethod
+    def _create_ts(base, unit, variable, values):
+        out = base.copy()
+        out.meta["unit"] = unit
+        out.meta["variable"] = variable
+        out[:] = values
 
         return out
