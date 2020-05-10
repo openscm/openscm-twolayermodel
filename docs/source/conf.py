@@ -44,7 +44,7 @@ extensions = [
 autodoc_default_options = {
     "inherited-members": None,
     "members": None,
-    "private-members": None,
+    # "private-members": False,
     "show-inheritance": None,
     "undoc-members": None,
 }

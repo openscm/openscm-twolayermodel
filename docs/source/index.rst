@@ -26,6 +26,10 @@ OpenSCM Two Layer Model
     :maxdepth: 2
     :caption: API reference
 
+    base
+    impulse_response_model
+    two_layer_model
+    errors
     utils
 
 .. toctree::

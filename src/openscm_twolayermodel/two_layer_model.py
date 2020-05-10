@@ -54,29 +54,6 @@ class TwoLayerModel(Model):
     ):
         """
         Initialise
-
-        Parameters
-        ----------
-        du : :obj:`pint.Quantity`
-            Depth of upper layer
-
-        dl : :obj:`pint.Quantity`
-            Depth of lower layer
-
-        lambda_0 : :obj:`pint.Quantity`
-            Initial climate feedback factor
-
-        a : :obj:`pint.Quantity`
-            Dependence of climate feedback factor on temperature
-
-        efficacy : :obj:`pint.Quantity`
-            Efficacy factor
-
-        eta : :obj:`pint.Quantity`
-            Heat transport efficiecny
-
-        delta_t : :obj:`pint.Quantity`
-            Time step for forward-differencing approximation
         """
         self.du = du
         self.dl = dl
@@ -91,9 +68,12 @@ class TwoLayerModel(Model):
         self._temp_lower_mag = np.nan
         self._rndt_mag = np.zeros(1) * np.nan
 
-    # must be a better way to handle this property creation...
     @property
     def du(self):
+        """
+        :obj:`pint.Quantity`
+            Depth of upper layer
+        """
         return self._du
 
     @du.setter
@@ -107,10 +87,18 @@ class TwoLayerModel(Model):
 
     @property
     def heat_capacity_upper(self):
+        """
+        :obj:`pint.Quantity`
+            Heat capacity of upper layer
+        """
         return self.du * self.density_water * self.heat_capacity_water
 
     @property
     def dl(self):
+        """
+        :obj:`pint.Quantity`
+            Depth of lower layer
+        """
         return self._dl
 
     @dl.setter
@@ -124,10 +112,18 @@ class TwoLayerModel(Model):
 
     @property
     def heat_capacity_lower(self):
+        """
+        :obj:`pint.Quantity`
+            Heat capacity of lower layer
+        """
         return self.dl * self.density_water * self.heat_capacity_water
 
     @property
     def lambda_0(self):
+        """
+        :obj:`pint.Quantity`
+            Initial climate feedback factor
+        """
         return self._lambda_0
 
     @lambda_0.setter
@@ -138,6 +134,10 @@ class TwoLayerModel(Model):
 
     @property
     def a(self):
+        """
+        :obj:`pint.Quantity`
+            Dependence of climate feedback factor on temperature
+        """
         return self._a
 
     @a.setter
@@ -148,6 +148,10 @@ class TwoLayerModel(Model):
 
     @property
     def efficacy(self):
+        """
+        :obj:`pint.Quantity`
+            Efficacy factor
+        """
         return self._efficacy
 
     @efficacy.setter
@@ -158,6 +162,10 @@ class TwoLayerModel(Model):
 
     @property
     def eta(self):
+        """
+        :obj:`pint.Quantity`
+            Heat transport efficiency
+        """
         return self._eta
 
     @eta.setter
@@ -168,6 +176,10 @@ class TwoLayerModel(Model):
 
     @property
     def delta_t(self):
+        """
+        :obj:`pint.Quantity`
+            Time step for forward-differencing approximation
+        """
         return self._delta_t
 
     @delta_t.setter
@@ -178,6 +190,10 @@ class TwoLayerModel(Model):
 
     @property
     def erf(self):
+        """
+        :obj:`pint.Quantity`
+            Effective radiative forcing
+        """
         return self._erf
 
     @erf.setter
@@ -293,9 +309,12 @@ class TwoLayerModel(Model):
 
     def run_scenarios(self, scenarios, driver_var="Effective Radiative Forcing"):
         """
-        TODO: move to base
+        Run scenarios.
 
-        Run scenarios
+        The model timestep is automatically adjusted based on the timestep used in ``scenarios``.
+        The timestep used in ``scenarios`` must be constant because this implementation
+        has a constant timestep. Pull requests to upgrade the implementation to support
+        variable timesteps are welcome `<https://github.com/openscm/openscm-twolayermodel/pulls>`_.
 
         Parameters
         ----------
@@ -311,6 +330,7 @@ class TwoLayerModel(Model):
         :obj:`ScmRun`
             Results of the run (including drivers)
         """
+        # TODO: put something like this in base
         if not isinstance(scenarios, ScmRun):
             driver = ScmRun(scenarios)
         else:
