@@ -353,7 +353,9 @@ class TwoLayerModel(Model):
 
         driver = driver.filter(variable=driver_var, region="World")
         if np.equal(driver.shape[0], 0):
-            raise ValueError("No World data available for driver_var `{}`".format(driver_var))
+            raise ValueError(
+                "No World data available for driver_var `{}`".format(driver_var)
+            )
 
         driver.set_meta("two_layer", "climate_model")
         for k, v in save_paras_meta.items():
@@ -418,7 +420,9 @@ class TwoLayerModel(Model):
 
             return in_ts
 
-        out = ScmRun(pd.concat([get_ordered_timeseries(r.timeseries()) for r in out], axis=0))
+        out = ScmRun(
+            pd.concat([get_ordered_timeseries(r.timeseries()) for r in out], axis=0)
+        )
 
         return out
 
@@ -439,10 +443,12 @@ class TwoLayerModel(Model):
             return 1 * ur("yr")
 
         time_diff = driver["time"].diff().dropna()
-        if all(np.logical_and(
-            time_diff <= np.timedelta64(31, 'D'),
-            time_diff >= np.timedelta64(28, 'D'),
-        )):
+        if all(
+            np.logical_and(
+                time_diff <= np.timedelta64(31, "D"),
+                time_diff >= np.timedelta64(28, "D"),
+            )
+        ):
             # Assume constant monthly timesteps. This is clearly an approximation but
             # while we have constant internal timesteps it's the best we can do.
             return 1 * ur("month")
