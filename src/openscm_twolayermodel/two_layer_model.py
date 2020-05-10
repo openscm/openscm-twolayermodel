@@ -351,7 +351,10 @@ class TwoLayerModel(Model):
             for k in save_paras
         }
 
-        driver = driver.filter(variable=driver_var)
+        driver = driver.filter(variable=driver_var, region="World")
+        if np.equal(driver.shape[0], 0):
+            raise ValueError("No World data available for driver_var `{}`".format(driver_var))
+
         driver.set_meta("two_layer", "climate_model")
         for k, v in save_paras_meta.items():
             driver.set_meta(v, k)

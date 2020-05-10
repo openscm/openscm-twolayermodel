@@ -63,6 +63,11 @@ def assert_scmruns_allclose(res, expected):
 
 
 @pytest.fixture
+def check_scmruns_allclose():
+    return assert_scmruns_allclose
+
+
+@pytest.fixture
 def run_model_output_comparison(tmpdir):
     def _do_comparison(res, expected, update=False):
         """
