@@ -1,8 +1,11 @@
 import numpy as np
+import pint.errors
 from openscm_units import unit_registry as ur
+from scmdata.timeseries import TimeSeries
+from scmdata.run import ScmRun
 
 from .base import Model
-from .errors import ModelStateError
+from .errors import ModelStateError, UnitError
 
 
 class TwoLayerModel(Model):
@@ -30,9 +33,14 @@ class TwoLayerModel(Model):
     _lambda_0_unit = "W/m^2/delta_degC"
     _a_unit = "W/m^2/delta_degC^2"
     _efficacy_unit = "dimensionless"
-    _eta_unit = "W/m^2/K"
+    _eta_unit = "W/m^2/delta_degC"
     _delta_t_unit = "s"
+
     _erf_unit = "W/m^2"
+
+    _temp_upper_unit = "delta_degC"
+    _temp_lower_unit = "delta_degC"
+    _rndt_unit = "W/m^2"
 
     def __init__(
         self,
@@ -41,7 +49,7 @@ class TwoLayerModel(Model):
         lambda_0=-3.74 / 3 * ur("W/m^2/delta_degC"),
         a=0.0 * ur("W/m^2/delta_degC^2"),
         efficacy=1.0 * ur("dimensionless"),
-        eta=0.8 * ur("W/m^2/K"),
+        eta=0.8 * ur("W/m^2/delta_degC"),
         delta_t=ur("yr").to("s")
     ):
         """
@@ -269,3 +277,48 @@ class TwoLayerModel(Model):
         uptake_upper = heat_capacity_upper * (t_upper_now - t_upper_prev) / delta_t
 
         return uptake_upper + uptake_lower
+
+    def run_scenarios(self, scenarios, driver_var="Effective Radiative Forcing"):
+        """
+        TODO: move to base
+
+        Run scenarios
+
+        Parameters
+        ----------
+        scenarios : :obj:`ScmDataFrame` or :obj:`ScmRun` or :obj:`pyam.IamDataFrame` or :obj:`pd.DataFrame` or :obj:`np.ndarray` or str
+            Scenarios to run. The input will be converted to an :obj:`ScmRun` before
+            the run takes place.
+
+        driver_var : str
+            The variable in ``scenarios`` to use as the driver of the model
+
+        Returns
+        -------
+        :obj:`ScmRun`
+            Results of the run (including drivers)
+        """
+        if not isinstance(scenarios, ScmRun):
+            driver = ScmRun(scenarios)
+        else:
+            driver = scenarios.copy()
+
+        driver = driver.filter(variable=driver_var)
+
+        out_ts = []
+        # TODO: ask Jared if there's a way to do this without accessing private method
+        for ts in driver._ts:
+            self.set_drivers(ts.values * ur(ts.meta["unit"]))
+            self.reset()
+            self.run()
+
+            out_ts.append(ts)
+            temp_upper_ts = ts.copy()
+            temp_upper_ts.meta["unit"] = self._temp_upper_unit
+
+        # TODO: ask Jared how we can handle this better
+        out = driver.copy()
+        out._ts = out_ts
+        out = ScmRun(out.timeseries())
+
+        return out

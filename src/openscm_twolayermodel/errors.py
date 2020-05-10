@@ -1,4 +1,4 @@
-class UnitsError(ValueError):
+class UnitError(ValueError):
     """
     Exception raised if something has the wrong units
     """
