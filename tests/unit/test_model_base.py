@@ -45,4 +45,3 @@ class ModelTester(ABC):
         test.run()
 
         test.step.assert_called()
-

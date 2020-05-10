@@ -122,6 +122,7 @@ def assert_pint_equal(a, b, **kwargs):
 
         raise AssertionError(error_msg)
 
+
 @pytest.fixture
 def check_equal_pint():
     return assert_pint_equal
