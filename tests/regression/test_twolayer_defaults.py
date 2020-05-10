@@ -1,5 +1,6 @@
 import os.path
 
+from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
 
 from openscm_twolayermodel import TwoLayerModel
@@ -25,7 +26,7 @@ def test_twolayer_plus_efficacy(
     test_twolayer_output_dir,
     run_model_output_comparison,
 ):
-    twolayer_plus_efficacy = TwoLayerModel(efficacy=1.2)
+    twolayer_plus_efficacy = TwoLayerModel(efficacy=1.2 * ur("dimensionless"))
     res = twolayer_plus_efficacy.run_scenarios(test_rcmip_forcings_scmrun)
 
     expected = os.path.join(test_twolayer_output_dir, "test_twolayer_plus_efficacy.csv")
@@ -39,9 +40,9 @@ def test_twolayer_plus_state_dependence(
     test_twolayer_output_dir,
     run_model_output_comparison,
 ):
-    twolayer_plus_state_dependence = TwoLayerModel(a=0.05)
+    twolayer_plus_state_dependence = TwoLayerModel(a=0.05 * ur("W/m^2/delta_degC^2"))
     res = twolayer_plus_state_dependence.run_scenarios(test_rcmip_forcings_scmrun)
 
-    expected = os.path.join(test_twolayer_output_dir, "test_twolayer_plus_efficacy.csv")
+    expected = os.path.join(test_twolayer_output_dir, "test_twolayer_plus_state_dependence.csv")
 
     run_model_output_comparison(res, expected, update_expected_files)

@@ -1,5 +1,7 @@
 import numpy as np
+import pandas as pd
 import pint.errors
+import tqdm.autonotebook as tqdman
 from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
 from scmdata.timeseries import TimeSeries
@@ -336,18 +338,43 @@ class TwoLayerModel(Model):
         else:
             driver = scenarios.copy()
 
+        save_paras = (
+            "du",
+            "dl",
+            "lambda_0",
+            "a",
+            "efficacy",
+            "eta",
+        )
+        save_paras_meta = {
+            "{} ({})".format(k, getattr(self, k).units): getattr(self, k).magnitude
+            for k in save_paras
+        }
+
         driver = driver.filter(variable=driver_var)
         driver.set_meta("two_layer", "climate_model")
+        for k, v in save_paras_meta.items():
+            driver.set_meta(v, k)
 
-        out_ts = []
-        # TODO: ask Jared if there's a way to do this without accessing private method
-        for ts in driver._ts:
+        out = []
+
+        driver_ts = driver.timeseries()
+        for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows())):
+            # TODO: ask Jared if there's a way to do this without going via
+            #       timeseries but that still drops nans
+            meta = {k: v for k, v in zip(driver_ts.index.names, label)}
+
+            row_no_nan = row.dropna()
+            ts = TimeSeries(data=row_no_nan.values, time=row_no_nan.index, attrs=meta)
+
             self.set_drivers(ts.values * ur(ts.meta["unit"]))
             self.reset()
             self.run()
 
-            out_ts.append(ts)
-            out_ts.append(
+            # TODO: ask Jared how we can handle this better
+            out_run_tss = [ts]
+
+            out_run_tss.append(
                 self._create_ts(
                     base=ts,
                     unit=self._temp_upper_unit,
@@ -355,7 +382,7 @@ class TwoLayerModel(Model):
                     values=self._temp_upper_mag,
                 )
             )
-            out_ts.append(
+            out_run_tss.append(
                 self._create_ts(
                     base=ts,
                     unit=self._temp_lower_unit,
@@ -363,7 +390,7 @@ class TwoLayerModel(Model):
                     values=self._temp_lower_mag,
                 )
             )
-            out_ts.append(
+            out_run_tss.append(
                 self._create_ts(
                     base=ts,
                     unit=self._rndt_unit,
@@ -372,10 +399,20 @@ class TwoLayerModel(Model):
                 )
             )
 
-        # TODO: ask Jared how we can handle this better
-        out = driver.copy()
-        out._ts = out_ts
-        out = ScmRun(out.timeseries())
+            out_run = ScmRun(row_no_nan, columns=meta)
+            out_run._ts = out_run_tss
+            out_run = ScmRun(out_run.timeseries())
+            out_run.set_meta(i, "run_idx")
+            out.append(out_run)
+
+        idx = out[0].meta.columns.tolist()
+
+        def get_ordered_timeseries(in_ts):
+            in_ts = in_ts.reorder_levels(idx)
+
+            return in_ts
+
+        out = ScmRun(pd.concat([get_ordered_timeseries(r.timeseries()) for r in out], axis=0))
 
         return out
 

@@ -52,15 +52,18 @@ def update_expected_files(request):
 
 
 def assert_scmruns_allclose(res, expected):
-    res_df = res.timeseries().sort_index()
-    assert not res_df.isnull().any().any(), "Failed sanity check"
-
     exp_df = expected.timeseries().sort_index()
+    meta_cols = exp_df.index.names
+
+    res_df = res.timeseries()
+    res_df.index = res_df.index.reorder_levels(meta_cols)
+    res_df = res_df.sort_index()
+
     pd.testing.assert_frame_equal(res_df, exp_df, check_like=True)
 
 
 @pytest.fixture
-def run_model_output_comparison():
+def run_model_output_comparison(tmpdir):
     def _do_comparison(res, expected, update=False):
         """
         Run test that results match expected output
@@ -85,9 +88,13 @@ def run_model_output_comparison():
         """
         if update:
             print("Updating {}".format(expected))
-            res.to_csv(expected)
+            res.to_csv(expected, index=False)
         else:
-            assert_scmruns_allclose(res, ScmRun(expected))
+            # scmdata bug: the saving and loading process mangles the column
+            # names so we have to save to disk before checking
+            tmpfile = os.path.join(tmpdir, "res.csv")
+            res.to_csv(tmpfile, index=False)
+            assert_scmruns_allclose(ScmRun(tmpfile), ScmRun(expected))
 
         if update:
             pytest.skip("Updated {}".format(expected))
