@@ -81,21 +81,6 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         with pytest.raises(AttributeError, match="can't set attribute"):
             model.heat_capacity_lower = 4
 
-    def test_set_erf(self, check_equal_pint):
-        terf = np.array([0, 1, 2]) * ur("W/m^2")
-
-        res = self.tmodel()
-        res.erf = terf
-
-        check_equal_pint(res.erf, terf)
-
-    def test_set_erf_unitless_error(self, check_equal_pint):
-        terf = np.array([0, 1, 2])
-
-        res = self.tmodel()
-        with pytest.raises(TypeError, match="erf must be a pint.Quantity"):
-            res.erf = terf
-
     def test_calculate_next_temp_upper(self, check_same_unit):
         tdelta_t = 30 * 24 * 60 * 60
         ttemp_upper = 0.1

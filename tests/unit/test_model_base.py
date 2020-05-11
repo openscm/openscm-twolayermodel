@@ -2,6 +2,7 @@ import re
 from abc import ABC, abstractmethod
 from unittest.mock import MagicMock
 
+import numpy as np
 import pint.errors
 import pytest
 from openscm_units import unit_registry as ur
@@ -69,3 +70,18 @@ class TwoLayerVariantTester(ModelTester):
             )
             with pytest.raises(UnitError, match=error_msg):
                 self.tmodel(**{parameter: tinp})
+
+    def test_set_erf(self, check_equal_pint):
+        terf = np.array([0, 1, 2]) * ur("W/m^2")
+
+        res = self.tmodel()
+        res.erf = terf
+
+        check_equal_pint(res.erf, terf)
+
+    def test_set_erf_unitless_error(self, check_equal_pint):
+        terf = np.array([0, 1, 2])
+
+        res = self.tmodel()
+        with pytest.raises(TypeError, match="erf must be a pint.Quantity"):
+            res.erf = terf
