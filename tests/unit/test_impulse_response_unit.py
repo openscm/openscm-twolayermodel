@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.testing as npt
 from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
@@ -10,8 +11,8 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
     tmodel = ImpulseResponseModel
 
     parameters = dict(
-        q1=0.33 * ur("delta_degC/W/m^2"),
-        q2=0.41 * ur("delta_degC/W/m^2"),
+        q1=0.33 * ur("delta_degC/(W/m^2)"),
+        q2=0.41 * ur("delta_degC/(W/m^2)"),
         d1=239.0 * ur("yr"),
         d2=4.1 * ur("yr"),
         delta_t=1 * ur("yr"),
@@ -19,8 +20,8 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
 
     def test_init(self):
         init_kwargs = dict(
-            q1=0.3 * ur("delta_degC/W/m^2"),
-            q2=0.4 * ur("delta_degC/W/m^2"),
+            q1=0.3 * ur("delta_degC/(W/m^2)"),
+            q2=0.4 * ur("delta_degC/(W/m^2)"),
             d1=250.0 * ur("yr"),
             d2=3 * ur("yr"),
             delta_t=1/12 * ur("yr"),
@@ -35,3 +36,71 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         assert np.isnan(res._temp1_mag)
         assert np.isnan(res._temp2_mag)
         assert np.isnan(res._rndt_mag)
+
+    def test_calculate_next_temp(self, check_same_unit):
+        tdelta_t = 30 * 24 * 60 * 60
+        ttemp = 0.1
+        tq = 0.4
+        td = 35.0
+        tf = 1.2
+
+        res = self.tmodel._calculate_next_temp(
+            tdelta_t,
+            ttemp,
+            tq,
+            td,
+            tf
+        )
+
+        expected = (
+            ttemp * np.exp(-tdelta_t / td) + tf * tq * (1 - np.exp(-tdelta_t / td))
+        )
+
+        npt.assert_equal(res, expected)
+
+        check_same_unit(self.tmodel._temp1_unit, self.tmodel._temp2_unit)
+        check_same_unit(self.tmodel._q1_unit, self.tmodel._q2_unit)
+        check_same_unit(self.tmodel._delta_t_unit, self.tmodel._d1_unit)
+        check_same_unit(self.tmodel._delta_t_unit, self.tmodel._d2_unit)
+        check_same_unit(
+            self.tmodel._temp1_unit,
+            (
+                1.0
+                * ur(self.tmodel._erf_unit)
+                * 1.0
+                * ur(self.tmodel._q1_unit)
+            ).units,
+        )
+
+    def test_calculate_next_rndt(self, check_same_unit):
+        ttemp = 1.1
+        tq1 = 0.5
+        tq2 = 0.3
+        terf = 1.2
+
+        res = self.tmodel._calculate_next_rndt(
+            ttemp,
+            terf,
+            tq1,
+            tq2,
+        )
+
+        # see notebook for discussion of why this is so
+        expected = (
+            terf - ttemp / (tq1 + tq2)
+        )
+
+        npt.assert_allclose(res, expected)
+
+        # check internal units make sense
+        check_same_unit(self.tmodel._q1_unit, self.tmodel._q2_unit)
+        check_same_unit(
+            self.tmodel._erf_unit,
+            (
+                (
+                    1.0
+                    * ur(self.tmodel._temp1_unit)
+                    / (1.0 * ur(self.tmodel._q1_unit))
+                ).units
+            ),
+        )

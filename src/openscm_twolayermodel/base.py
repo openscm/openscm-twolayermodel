@@ -61,3 +61,74 @@ class Model(ABC):
     @abstractmethod
     def _step(self):
         pass
+
+
+class TwoLayerVariant(Model):
+    """
+    Base for variations of implementations of the two-layer model
+    """
+    _delta_t_unit = "s"
+    _erf_unit = "W/m^2"
+
+    @property
+    def delta_t(self):
+        """
+        :obj:`pint.Quantity`
+            Time step for forward-differencing approximation
+        """
+        return self._delta_t
+
+    @delta_t.setter
+    def delta_t(self, val):
+        self._check_is_pint_quantity(val, "delta_t", self._delta_t_unit)
+        self._delta_t = val
+        self._delta_t_mag = val.to(self._delta_t_unit).magnitude
+
+    @property
+    def erf(self):
+        """
+        :obj:`pint.Quantity`
+            Effective radiative forcing
+        """
+        return self._erf
+
+    @erf.setter
+    def erf(self, val):
+        self._check_is_pint_quantity(val, "erf", self._erf_unit)
+        self._erf = val
+        self._erf_mag = val.to(self._erf_unit).magnitude
+
+    @property
+    def erf(self):
+        """
+        :obj:`pint.Quantity`
+            Effective radiative forcing
+        """
+        return self._erf
+
+    @erf.setter
+    def erf(self, val):
+        self._check_is_pint_quantity(val, "erf", self._erf_unit)
+        self._erf = val
+        self._erf_mag = val.to(self._erf_unit).magnitude
+
+    def set_drivers(
+        self, erf
+    ):  # pylint: disable=arguments-differ # hmm need to think about this
+        """
+        Set drivers for a model run
+
+        Parameters
+        ----------
+        erf : :obj:`pint.Quantity`
+            Effective radiative forcing (W/m^2) to use to drive the model
+
+        Raises
+        ------
+        AssertionError
+            ``erf`` is not one-dimensional
+        """
+        if len(erf.shape) != 1:
+            raise AssertionError("erf must be one-dimensional")
+
+        self.erf = erf
