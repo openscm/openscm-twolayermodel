@@ -5,13 +5,13 @@ import numpy.testing as npt
 import pint.errors
 import pytest
 from openscm_units import unit_registry as ur
-from test_model_base import ModelTester
+from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import TwoLayerModel
 from openscm_twolayermodel.errors import ModelStateError, UnitError
 
 
-class TestTwoLayerModel(ModelTester):
+class TestTwoLayerModel(TwoLayerVariantTester):
     tmodel = TwoLayerModel
 
     parameters = dict(
@@ -95,24 +95,6 @@ class TestTwoLayerModel(ModelTester):
         res = self.tmodel()
         with pytest.raises(TypeError, match="erf must be a pint.Quantity"):
             res.erf = terf
-
-    def test_init_wrong_units(self):
-        helper = self.tmodel()
-
-        for parameter in self.parameters.keys():
-            tinp = 34.3 * ur("kg")
-            default = getattr(helper, parameter)
-
-            try:
-                tinp.to(default.units)
-            except pint.errors.DimensionalityError as e:
-                pint_msg = str(e)
-
-            error_msg = re.escape(
-                "Wrong units for `{}`. {}".format(parameter, pint_msg)
-            )
-            with pytest.raises(UnitError, match=error_msg):
-                self.tmodel(**{parameter: tinp})
 
     def test_calculate_next_temp_upper(self, check_same_unit):
         tdelta_t = 30 * 24 * 60 * 60
