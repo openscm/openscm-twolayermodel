@@ -1,8 +1,12 @@
+import re
 from abc import ABC, abstractmethod
 from unittest.mock import MagicMock
 
+import pint.errors
 import pytest
 from openscm_units import unit_registry as ur
+
+from openscm_twolayermodel.errors import UnitError
 
 
 class ModelTester(ABC):
@@ -45,3 +49,23 @@ class ModelTester(ABC):
         test.run()
 
         test.step.assert_called()
+
+
+class TwoLayerVariantTester(ModelTester):
+    def test_init_wrong_units(self):
+        helper = self.tmodel()
+
+        for parameter in self.parameters.keys():
+            tinp = 34.3 * ur("kg")
+            default = getattr(helper, parameter)
+
+            try:
+                tinp.to(default.units)
+            except pint.errors.DimensionalityError as e:
+                pint_msg = str(e)
+
+            error_msg = re.escape(
+                "Wrong units for `{}`. {}".format(parameter, pint_msg)
+            )
+            with pytest.raises(UnitError, match=error_msg):
+                self.tmodel(**{parameter: tinp})
