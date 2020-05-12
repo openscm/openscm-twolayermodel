@@ -2,11 +2,7 @@
 Module containing the two-layer model
 """
 import numpy as np
-import pandas as pd
-import tqdm.autonotebook as tqdman
 from openscm_units import unit_registry as ur
-from scmdata.run import ScmRun
-from scmdata.timeseries import TimeSeries
 
 from .base import TwoLayerVariant
 from .errors import ModelStateError

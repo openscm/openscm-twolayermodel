@@ -77,6 +77,7 @@ class TwoLayerVariant(Model):
     """
     Base for variations of implementations of the two-layer model
     """
+
     _delta_t_unit = "s"
     _erf_unit = "W/m^2"
 
@@ -93,20 +94,6 @@ class TwoLayerVariant(Model):
         self._check_is_pint_quantity(val, "delta_t", self._delta_t_unit)
         self._delta_t = val
         self._delta_t_mag = val.to(self._delta_t_unit).magnitude
-
-    @property
-    def erf(self):
-        """
-        :obj:`pint.Quantity`
-            Effective radiative forcing
-        """
-        return self._erf
-
-    @erf.setter
-    def erf(self, val):
-        self._check_is_pint_quantity(val, "erf", self._erf_unit)
-        self._erf = val
-        self._erf_mag = val.to(self._erf_unit).magnitude
 
     @property
     def erf(self):
@@ -238,7 +225,7 @@ class TwoLayerVariant(Model):
         for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows())):
             # TODO: ask Jared if there's a way to do this without going via
             #       timeseries but that still drops nans
-            meta = {k: v for k, v in zip(driver_ts.index.names, label)}
+            meta = dict(zip(driver_ts.index.names, label))
 
             row_no_nan = row.dropna()
             ts = TimeSeries(data=row_no_nan.values, time=row_no_nan.index, attrs=meta)
@@ -274,5 +261,5 @@ class TwoLayerVariant(Model):
         return out
 
     @abstractmethod
-    def _get_run_output_tss(self, ts):
+    def _get_run_output_tss(self, ts_base):
         pass

@@ -1,7 +1,5 @@
 import os.path
 
-from openscm_units import unit_registry as ur
-
 from openscm_twolayermodel import ImpulseResponseModel
 
 
@@ -14,6 +12,8 @@ def test_impulse_response_defaults(
     impulse_response_default = ImpulseResponseModel()
     res = impulse_response_default.run_scenarios(test_rcmip_forcings_scmrun)
 
-    expected = os.path.join(test_twolayer_output_dir, "test_impulse_response_defaults.csv")
+    expected = os.path.join(
+        test_twolayer_output_dir, "test_impulse_response_defaults.csv"
+    )
 
     run_model_output_comparison(res, expected, update_expected_files)

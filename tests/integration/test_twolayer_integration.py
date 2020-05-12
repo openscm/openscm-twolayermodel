@@ -6,7 +6,6 @@ from scmdata import ScmRun
 from test_model_integration_base import TwoLayerVariantIntegrationTester
 
 from openscm_twolayermodel import TwoLayerModel
-from openscm_twolayermodel.errors import UnitError
 
 
 class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
