@@ -5,13 +5,13 @@ from openscm_units import unit_registry as ur
 from scmdata import ScmRun
 from test_model_integration_base import TwoLayerVariantIntegrationTester
 
-from openscm_twolayermodel import TwoLayerModel
+from openscm_twolayermodel import ImpulseResponseModel
 from openscm_twolayermodel.errors import UnitError
 
 
 class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
 
-    tmodel = TwoLayerModel
+    tmodel = ImpulseResponseModel
 
     def test_run_scenarios_single(self):
         inp = self.tinp.copy()
@@ -27,22 +27,33 @@ class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
         model.run()
 
         npt.assert_allclose(
-            res.filter(variable="Surface Temperature|Upper").values.squeeze(),
-            model._temp_upper_mag,
+            res.filter(variable="Surface Temperature").values.squeeze(),
+            model._temp1_mag + model._temp2_mag,
         )
         assert (
-            res.filter(variable="Surface Temperature|Upper").get_unique_meta(
+            res.filter(variable="Surface Temperature").get_unique_meta(
                 "unit", no_duplicates=True
             )
             == "delta_degC"
         )
 
         npt.assert_allclose(
-            res.filter(variable="Surface Temperature|Lower").values.squeeze(),
-            model._temp_lower_mag,
+            res.filter(variable="Surface Temperature|Box 1").values.squeeze(),
+            model._temp1_mag,
         )
         assert (
-            res.filter(variable="Surface Temperature|Lower").get_unique_meta(
+            res.filter(variable="Surface Temperature|Box 1").get_unique_meta(
+                "unit", no_duplicates=True
+            )
+            == "delta_degC"
+        )
+
+        npt.assert_allclose(
+            res.filter(variable="Surface Temperature|Box 2").values.squeeze(),
+            model._temp2_mag,
+        )
+        assert (
+            res.filter(variable="Surface Temperature|Box 2").get_unique_meta(
                 "unit", no_duplicates=True
             )
             == "delta_degC"
@@ -92,22 +103,33 @@ class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
             res_scen = res.filter(scenario=scenario)
 
             npt.assert_allclose(
-                res_scen.filter(variable="Surface Temperature|Upper").values.squeeze(),
-                model._temp_upper_mag,
+                res_scen.filter(variable="Surface Temperature").values.squeeze(),
+                model._temp1_mag + model._temp2_mag,
             )
             assert (
-                res.filter(variable="Surface Temperature|Upper").get_unique_meta(
+                res_scen.filter(variable="Surface Temperature").get_unique_meta(
                     "unit", no_duplicates=True
                 )
                 == "delta_degC"
             )
 
             npt.assert_allclose(
-                res_scen.filter(variable="Surface Temperature|Lower").values.squeeze(),
-                model._temp_lower_mag,
+                res_scen.filter(variable="Surface Temperature|Box 1").values.squeeze(),
+                model._temp1_mag,
             )
             assert (
-                res.filter(variable="Surface Temperature|Lower").get_unique_meta(
+                res_scen.filter(variable="Surface Temperature|Box 1").get_unique_meta(
+                    "unit", no_duplicates=True
+                )
+                == "delta_degC"
+            )
+
+            npt.assert_allclose(
+                res_scen.filter(variable="Surface Temperature|Box 2").values.squeeze(),
+                model._temp2_mag,
+            )
+            assert (
+                res_scen.filter(variable="Surface Temperature|Box 2").get_unique_meta(
                     "unit", no_duplicates=True
                 )
                 == "delta_degC"
@@ -175,22 +197,22 @@ class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
             res_scen = res.filter(scenario=scenario)
 
             npt.assert_allclose(
-                res_scen.filter(variable="Surface Temperature|Upper").values.squeeze(),
-                model._temp_upper_mag,
+                res_scen.filter(variable="Surface Temperature|Box 1").values.squeeze(),
+                model._temp1_mag,
             )
             assert (
-                res.filter(variable="Surface Temperature|Upper").get_unique_meta(
+                res.filter(variable="Surface Temperature|Box 1").get_unique_meta(
                     "unit", no_duplicates=True
                 )
                 == "delta_degC"
             )
 
             npt.assert_allclose(
-                res_scen.filter(variable="Surface Temperature|Lower").values.squeeze(),
-                model._temp_lower_mag,
+                res_scen.filter(variable="Surface Temperature|Box 2").values.squeeze(),
+                model._temp2_mag,
             )
             assert (
-                res.filter(variable="Surface Temperature|Lower").get_unique_meta(
+                res.filter(variable="Surface Temperature|Box 2").get_unique_meta(
                     "unit", no_duplicates=True
                 )
                 == "delta_degC"
@@ -220,7 +242,7 @@ class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
         check_equal_pint(model.delta_t, 1 * ur("month"))
 
         comp_filter = {
-            "variable": "Surface Temperature|Upper",
+            "variable": "Surface Temperature",
             "year": int(
                 res["year"].iloc[-1]
             ),  # scmdata bug that you have to wrap this with int()
@@ -231,6 +253,6 @@ class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
         npt.assert_allclose(
             res.filter(**comp_filter).values.squeeze(),
             res_monthly.filter(**comp_filter).values.squeeze(),
-            rtol=1e-3,
+            rtol=6*1e-3,
         )
-        res.filter(variable="Surface Temperature|Upper")
+        res.filter(variable="Surface Temperature")
