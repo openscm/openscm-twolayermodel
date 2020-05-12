@@ -10,8 +10,10 @@ from openscm_units import unit_registry as ur
 from .base import TwoLayerVariant
 from .errors import ModelStateError
 
+# pylint: disable=invalid-name
 
-class ImpulseResponseModel(TwoLayerVariant):
+
+class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attributes
     """
     TODO: top line and paper references
 
@@ -22,6 +24,7 @@ class ImpulseResponseModel(TwoLayerVariant):
     values will always be zero and the last value in the input drivers has no
     effect on model output.
     """
+
     _d1_unit = "yr"
     _d2_unit = "yr"
     _q1_unit = "delta_degC/(W/m^2)"
@@ -40,7 +43,7 @@ class ImpulseResponseModel(TwoLayerVariant):
         q2=0.4 * ur("delta_degC/(W/m^2)"),
         d1=250.0 * ur("yr"),
         d2=3 * ur("yr"),
-        delta_t=1/12 * ur("yr"),
+        delta_t=1 / 12 * ur("yr"),
     ):  # pylint: disable=too-many-arguments
         """
         Initialise
@@ -158,7 +161,8 @@ class ImpulseResponseModel(TwoLayerVariant):
             )
 
             self._rndt_mag[self._timestep_idx] = self._calculate_next_rndt(
-                self._temp1_mag[self._timestep_idx - 1] + self._temp2_mag[self._timestep_idx - 1],
+                self._temp1_mag[self._timestep_idx - 1]
+                + self._temp2_mag[self._timestep_idx - 1],
                 self._erf_mag[self._timestep_idx - 1],
                 self._q1_mag,
                 self._q2_mag,

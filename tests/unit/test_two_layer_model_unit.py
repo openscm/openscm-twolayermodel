@@ -1,14 +1,10 @@
-import re
-
 import numpy as np
 import numpy.testing as npt
-import pint.errors
 import pytest
 from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import TwoLayerModel
-from openscm_twolayermodel.errors import ModelStateError, UnitError
 
 
 class TestTwoLayerModel(TwoLayerVariantTester):

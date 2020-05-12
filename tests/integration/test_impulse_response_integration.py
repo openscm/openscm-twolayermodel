@@ -6,7 +6,6 @@ from scmdata import ScmRun
 from test_model_integration_base import TwoLayerVariantIntegrationTester
 
 from openscm_twolayermodel import ImpulseResponseModel
-from openscm_twolayermodel.errors import UnitError
 
 
 class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
@@ -253,6 +252,6 @@ class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
         npt.assert_allclose(
             res.filter(**comp_filter).values.squeeze(),
             res_monthly.filter(**comp_filter).values.squeeze(),
-            rtol=6*1e-3,
+            rtol=6 * 1e-3,
         )
         res.filter(variable="Surface Temperature")

@@ -4,7 +4,6 @@ from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import ImpulseResponseModel
-from openscm_twolayermodel.errors import ModelStateError, UnitError
 
 
 class TestImpulseResponseModel(TwoLayerVariantTester):
@@ -24,7 +23,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             q2=0.4 * ur("delta_degC/(W/m^2)"),
             d1=250.0 * ur("yr"),
             d2=3 * ur("yr"),
-            delta_t=1/12 * ur("yr"),
+            delta_t=1 / 12 * ur("yr"),
         )
 
         res = self.tmodel(**init_kwargs)
@@ -44,16 +43,10 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         td = 35.0
         tf = 1.2
 
-        res = self.tmodel._calculate_next_temp(
-            tdelta_t,
-            ttemp,
-            tq,
-            td,
-            tf
-        )
+        res = self.tmodel._calculate_next_temp(tdelta_t, ttemp, tq, td, tf)
 
-        expected = (
-            ttemp * np.exp(-tdelta_t / td) + tf * tq * (1 - np.exp(-tdelta_t / td))
+        expected = ttemp * np.exp(-tdelta_t / td) + tf * tq * (
+            1 - np.exp(-tdelta_t / td)
         )
 
         npt.assert_equal(res, expected)
@@ -64,12 +57,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         check_same_unit(self.tmodel._delta_t_unit, self.tmodel._d2_unit)
         check_same_unit(
             self.tmodel._temp1_unit,
-            (
-                1.0
-                * ur(self.tmodel._erf_unit)
-                * 1.0
-                * ur(self.tmodel._q1_unit)
-            ).units,
+            (1.0 * ur(self.tmodel._erf_unit) * 1.0 * ur(self.tmodel._q1_unit)).units,
         )
 
     def test_calculate_next_rndt(self, check_same_unit):
@@ -78,17 +66,10 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         tq2 = 0.3
         terf = 1.2
 
-        res = self.tmodel._calculate_next_rndt(
-            ttemp,
-            terf,
-            tq1,
-            tq2,
-        )
+        res = self.tmodel._calculate_next_rndt(ttemp, terf, tq1, tq2,)
 
         # see notebook for discussion of why this is so
-        expected = (
-            terf - ttemp / (tq1 + tq2)
-        )
+        expected = terf - ttemp / (tq1 + tq2)
 
         npt.assert_allclose(res, expected)
 
@@ -98,9 +79,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             self.tmodel._erf_unit,
             (
                 (
-                    1.0
-                    * ur(self.tmodel._temp1_unit)
-                    / (1.0 * ur(self.tmodel._q1_unit))
+                    1.0 * ur(self.tmodel._temp1_unit) / (1.0 * ur(self.tmodel._q1_unit))
                 ).units
             ),
         )
@@ -149,7 +128,8 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         npt.assert_equal(
             model._rndt_mag[model._timestep_idx],
             model._calculate_next_rndt(
-                model._temp1_mag[model._timestep_idx - 1] + model._temp2_mag[model._timestep_idx - 1],
+                model._temp1_mag[model._timestep_idx - 1]
+                + model._temp2_mag[model._timestep_idx - 1],
                 model._erf_mag[model._timestep_idx - 1],
                 model._q1_mag,
                 model._q2_mag,
