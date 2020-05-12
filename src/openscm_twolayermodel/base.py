@@ -3,8 +3,14 @@ Module containing the base for model implementations
 """
 from abc import ABC, abstractmethod
 
+import numpy as np
+import pandas as pd
 import pint
 import pint.errors
+import tqdm.autonotebook as tqdman
+from openscm_units import unit_registry as ur
+from scmdata.run import ScmRun
+from scmdata.timeseries import TimeSeries
 
 from .errors import UnitError
 
@@ -13,6 +19,10 @@ class Model(ABC):
     """
     Base class for model implementations
     """
+
+    _save_paras = tuple()  # parameters to save when doing a run
+
+    _name = None  # model name
 
     @staticmethod
     def _check_is_pint_quantity(quantity, name, model_units):
@@ -132,3 +142,137 @@ class TwoLayerVariant(Model):
             raise AssertionError("erf must be one-dimensional")
 
         self.erf = erf
+
+    @staticmethod
+    def _ensure_scenarios_are_scmrun(scenarios):
+        if not isinstance(scenarios, ScmRun):
+            driver = ScmRun(scenarios)
+        else:
+            driver = scenarios.copy()
+
+        return driver
+
+    @staticmethod
+    def _create_ts(base, unit, variable, values):
+        out = base.copy()
+        out.meta["unit"] = unit
+        out.meta["variable"] = variable
+        out[:] = values
+
+        return out
+
+    @staticmethod
+    def _select_timestep(driver):
+        year_diff = driver["year"].diff().dropna()
+        if (year_diff == 1).all():
+            # assume yearly timesteps
+            return 1 * ur("yr")
+
+        time_diff = driver["time"].diff().dropna()
+        if all(
+            np.logical_and(
+                time_diff <= np.timedelta64(31, "D"),
+                time_diff >= np.timedelta64(28, "D"),
+            )
+        ):
+            # Assume constant monthly timesteps. This is clearly an approximation but
+            # while we have constant internal timesteps it's the best we can do.
+            return 1 * ur("month")
+
+        raise NotImplementedError(
+            "Could not decide on timestep for time axis: {}".format(driver["time"])
+        )
+
+    def run_scenarios(self, scenarios, driver_var="Effective Radiative Forcing"):
+        """
+        Run scenarios.
+
+        The model timestep is automatically adjusted based on the timestep used in ``scenarios``.
+        The timestep used in ``scenarios`` must be constant because this implementation
+        has a constant timestep. Pull requests to upgrade the implementation to support
+        variable timesteps are welcome `<https://github.com/openscm/openscm-twolayermodel/pulls>`_.
+
+        Parameters
+        ----------
+        scenarios : :obj:`ScmDataFrame` or :obj:`ScmRun` or :obj:`pyam.IamDataFrame` or :obj:`pd.DataFrame` or :obj:`np.ndarray` or str
+            Scenarios to run. The input will be converted to an :obj:`ScmRun` before
+            the run takes place.
+
+        driver_var : str
+            The variable in ``scenarios`` to use as the driver of the model
+
+        Returns
+        -------
+        :obj:`ScmRun`
+            Results of the run (including drivers)
+
+        Raises
+        ------
+        ValueError
+            No data is available for ``driver_var`` in the ``"World"`` region in
+            ``scenarios``.
+        """
+        driver = self._ensure_scenarios_are_scmrun(scenarios)
+
+        save_paras_meta = {
+            "{} ({})".format(k, getattr(self, k).units): getattr(self, k).magnitude
+            for k in self._save_paras
+        }
+
+        driver = driver.filter(variable=driver_var, region="World")
+        if np.equal(driver.shape[0], 0):
+            raise ValueError(
+                "No World data available for driver_var `{}`".format(driver_var)
+            )
+
+        driver.set_meta(self._name, "climate_model")
+        for k, v in save_paras_meta.items():
+            driver.set_meta(v, k)
+
+        timestep = self._select_timestep(driver)
+        self.delta_t = timestep
+
+        run_store = list()
+
+        driver_ts = driver.timeseries()
+        for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows())):
+            # TODO: ask Jared if there's a way to do this without going via
+            #       timeseries but that still drops nans
+            meta = {k: v for k, v in zip(driver_ts.index.names, label)}
+
+            row_no_nan = row.dropna()
+            ts = TimeSeries(data=row_no_nan.values, time=row_no_nan.index, attrs=meta)
+
+            self.set_drivers(ts.values * ur(ts.meta["unit"]))
+            self.reset()
+            self.run()
+
+            out_run_tss = [ts]
+            out_run_tss += self._get_run_output_tss(ts)
+
+            # TODO: ask Jared how we can handle this better
+            out_run = ScmRun(row_no_nan, columns=meta)
+            out_run._ts = out_run_tss
+            out_run = ScmRun(out_run.timeseries())
+            out_run.set_meta(i, "run_idx")
+
+            run_store.append(out_run)
+
+        idx = run_store[0].meta.columns.tolist()
+
+        def get_ordered_timeseries(in_ts):
+            in_ts = in_ts.reorder_levels(idx)
+
+            return in_ts
+
+        out = ScmRun(
+            pd.concat(
+                [get_ordered_timeseries(r.timeseries()) for r in run_store], axis=0
+            )
+        )
+
+        return out
+
+    @abstractmethod
+    def _get_run_output_tss(self, ts):
+        pass

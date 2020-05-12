@@ -174,3 +174,41 @@ class ImpulseResponseModel(TwoLayerVariant):
     @staticmethod
     def _calculate_next_rndt(t, erf, q1, q2):
         return erf - t / (q1 + q2)
+
+    def _get_run_output_tss(self, ts_base):
+        out_run_tss = []
+
+        out_run_tss.append(
+            self._create_ts(
+                base=ts_base,
+                unit=self._temp1_unit,
+                variable="Surface Temperature|Box 1",
+                values=self._temp1_mag,
+            )
+        )
+        out_run_tss.append(
+            self._create_ts(
+                base=ts_base,
+                unit=self._temp2_unit,
+                variable="Surface Temperature|Box 2",
+                values=self._temp2_mag,
+            )
+        )
+        out_run_tss.append(
+            self._create_ts(
+                base=ts_base,
+                unit=self._temp1_unit,
+                variable="Surface Temperature",
+                values=self._temp1_mag + self._temp2_mag,
+            )
+        )
+        out_run_tss.append(
+            self._create_ts(
+                base=ts_base,
+                unit=self._rndt_unit,
+                variable="Heat Uptake",
+                values=self._rndt_mag,
+            )
+        )
+
+        return out_run_tss
