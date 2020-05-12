@@ -7,7 +7,7 @@ import pint.errors
 import pytest
 from openscm_units import unit_registry as ur
 
-from openscm_twolayermodel.errors import UnitError
+from openscm_twolayermodel.errors import ModelStateError, UnitError
 
 
 class ModelTester(ABC):
@@ -85,3 +85,8 @@ class TwoLayerVariantTester(ModelTester):
         res = self.tmodel()
         with pytest.raises(TypeError, match="erf must be a pint.Quantity"):
             res.erf = terf
+
+    def test_reset_not_set_error(self):
+        error_msg = "The model's drivers have not been set yet, call :meth:`self.set_drivers` first."
+        with pytest.raises(ModelStateError, match=error_msg):
+            self.tmodel().reset()
