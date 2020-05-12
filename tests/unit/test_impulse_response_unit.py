@@ -104,3 +104,101 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
                 ).units
             ),
         )
+
+    def test_step(self):
+        # move to integration tests
+        terf = np.array([3, 4, 5, 6, 7]) * ur("W/m^2")
+
+        model = self.tmodel()
+        model.set_drivers(terf)
+        model.reset()
+
+        model.step()
+        assert model._timestep_idx == 0
+        npt.assert_equal(model._temp1_mag[model._timestep_idx], 0)
+        npt.assert_equal(model._temp2_mag[model._timestep_idx], 0)
+        npt.assert_equal(model._rndt_mag[model._timestep_idx], 0)
+
+        model.step()
+        model.step()
+        model.step()
+        assert model._timestep_idx == 3
+
+        npt.assert_equal(
+            model._temp1_mag[model._timestep_idx],
+            model._calculate_next_temp(
+                model._delta_t_mag,
+                model._temp1_mag[model._timestep_idx - 1],
+                model._q1_mag,
+                model._d1_mag,
+                model._erf_mag[model._timestep_idx - 1],
+            ),
+        )
+
+        npt.assert_equal(
+            model._temp2_mag[model._timestep_idx],
+            model._calculate_next_temp(
+                model._delta_t_mag,
+                model._temp2_mag[model._timestep_idx - 1],
+                model._q2_mag,
+                model._d2_mag,
+                model._erf_mag[model._timestep_idx - 1],
+            ),
+        )
+
+        npt.assert_equal(
+            model._rndt_mag[model._timestep_idx],
+            model._calculate_next_rndt(
+                model._temp1_mag[model._timestep_idx - 1] + model._temp2_mag[model._timestep_idx - 1],
+                model._erf_mag[model._timestep_idx - 1],
+                model._q1_mag,
+                model._q2_mag,
+            ),
+        )
+
+    def test_reset(self):
+        terf = np.array([0, 1, 2]) * ur("W/m^2")
+
+        model = self.tmodel()
+        model.set_drivers(terf)
+
+        def assert_is_nan_and_erf_shape(inp):
+            assert np.isnan(inp).all()
+            assert inp.shape == terf.shape
+
+        model.reset()
+        # after reset, we are not in any timestep
+        assert np.isnan(model._timestep_idx)
+        assert_is_nan_and_erf_shape(model._temp1_mag)
+        assert_is_nan_and_erf_shape(model._temp2_mag)
+        assert_is_nan_and_erf_shape(model._rndt_mag)
+
+    def test_reset_run_reset(self):
+        # move to integration tests
+        terf = np.array([0, 1, 2, 3, 4, 5]) * ur("W/m^2")
+
+        model = self.tmodel()
+        model.set_drivers(terf)
+
+        def assert_is_nan_and_erf_shape(inp):
+            assert np.isnan(inp).all()
+            assert inp.shape == terf.shape
+
+        model.reset()
+        assert_is_nan_and_erf_shape(model._temp1_mag)
+        assert_is_nan_and_erf_shape(model._temp2_mag)
+        assert_is_nan_and_erf_shape(model._rndt_mag)
+
+        def assert_ge_zero_and_erf_shape(inp):
+            assert not (inp < 0).any()
+            assert inp.shape == terf.shape
+
+        model.run()
+        assert_ge_zero_and_erf_shape(model._temp1_mag)
+        assert_ge_zero_and_erf_shape(model._temp2_mag)
+        assert_ge_zero_and_erf_shape(model._rndt_mag)
+
+        model.reset()
+        assert_is_nan_and_erf_shape(model._temp1_mag)
+        assert_is_nan_and_erf_shape(model._temp2_mag)
+        assert_is_nan_and_erf_shape(model._rndt_mag)

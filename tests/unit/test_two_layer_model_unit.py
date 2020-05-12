@@ -353,8 +353,3 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         assert_is_nan_and_erf_shape(model._temp_upper_mag)
         assert_is_nan_and_erf_shape(model._temp_lower_mag)
         assert_is_nan_and_erf_shape(model._rndt_mag)
-
-    def test_reset_not_set_error(self):
-        error_msg = "The model's drivers have not been set yet, call :meth:`self.set_drivers` first."
-        with pytest.raises(ModelStateError, match=error_msg):
-            self.tmodel().reset()

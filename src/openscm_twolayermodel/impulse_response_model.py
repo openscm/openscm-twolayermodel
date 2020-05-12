@@ -132,7 +132,37 @@ class ImpulseResponseModel(TwoLayerVariant):
         if np.isnan(self._timestep_idx):
             self._timestep_idx = 0
 
-        raise NotImplementedError
+        else:
+            self._timestep_idx += 1
+
+        if np.equal(self._timestep_idx, 0):
+            self._temp1_mag[self._timestep_idx] = 0.0
+            self._temp2_mag[self._timestep_idx] = 0.0
+            self._rndt_mag[self._timestep_idx] = 0.0
+
+        else:
+            self._temp1_mag[self._timestep_idx] = self._calculate_next_temp(
+                self._delta_t_mag,
+                self._temp1_mag[self._timestep_idx - 1],
+                self._q1_mag,
+                self._d1_mag,
+                self._erf_mag[self._timestep_idx - 1],
+            )
+
+            self._temp2_mag[self._timestep_idx] = self._calculate_next_temp(
+                self._delta_t_mag,
+                self._temp2_mag[self._timestep_idx - 1],
+                self._q2_mag,
+                self._d2_mag,
+                self._erf_mag[self._timestep_idx - 1],
+            )
+
+            self._rndt_mag[self._timestep_idx] = self._calculate_next_rndt(
+                self._temp1_mag[self._timestep_idx - 1] + self._temp2_mag[self._timestep_idx - 1],
+                self._erf_mag[self._timestep_idx - 1],
+                self._q1_mag,
+                self._q2_mag,
+            )
 
     @staticmethod
     def _calculate_next_temp(delta_t, t, q, d, erf):
