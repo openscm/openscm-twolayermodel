@@ -14,6 +14,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         q2=0.41 * ur("delta_degC/(W/m^2)"),
         d1=239.0 * ur("yr"),
         d2=4.1 * ur("yr"),
+        # efficacy=1.0 * ur("efficacy"), # TODO: turn on because efficacy determines implied ocean heat uptake of impulse response model
         delta_t=1 * ur("yr"),
     )
 
