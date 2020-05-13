@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -349,3 +351,55 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         assert_is_nan_and_erf_shape(model._temp_upper_mag)
         assert_is_nan_and_erf_shape(model._temp_lower_mag)
         assert_is_nan_and_erf_shape(model._rndt_mag)
+
+    def test_get_impulse_response_parameters(self):
+        tdu = 35 * ur("m")
+        tdl = 3200 * ur("m")
+        tlambda_0=-4 / 3 * ur("W/m^2/delta_degC")
+        tefficacy=1.1 * ur("dimensionless")
+        teta=0.7 * ur("W/m^2/delta_degC")
+
+        mod_instance = self.tmodel(
+            du=tdu,
+            dl=tdl,
+            lambda_0=tlambda_0,
+            a=0.0 * ur("W/m^2/delta_degC^2"),
+            efficacy=tefficacy,
+            eta=teta,
+        )
+
+        # for explanation of what is going on, see
+        # impulse-response-equivalence.ipynb
+        C = mod_instance.heat_capacity_upper
+        C_D = mod_instance.heat_capacity_lower
+
+        b =(tlambda_0 + tefficacy * teta) / C + teta / C_D
+        b_star =(tlambda_0 + tefficacy * teta) / C - teta / C_D
+        delta = b**2 - 4 * tlambda_0 * teta / (C * C_D)
+
+        tau1 = C * C_D / (2 * tlambda_0 * teta) * (b - delta**0.5)
+        tau2 = C * C_D / (2 * tlambda_0 * teta) * (b + delta**0.5)
+        phi1 = C / (2 * tefficacy * teta) * (b_star - delta**0.5)
+        phi2 = C / (2 * tefficacy * teta) * (b_star + delta**0.5)
+
+        expected = {
+            "q1": tau1 * phi2 / (C*(phi2 - phi1)),
+            "q2": tau2 * phi1 / (C*(phi2 - phi1)),
+            "d1": tau1,
+            "d2": tau2,
+            "efficacy": tefficacy,
+        }
+
+        res = mod_instance.get_impulse_response_parameters()
+
+        assert res == expected
+
+    def test_get_impulse_response_parameters_non_zero_a_raises(self):
+        ta = 0.1 * ur("W/m^2/delta_degC^2")
+
+        error_msg = re.escape(
+            "Cannot calculate impulse response parameters with "
+            "non-zero a={}".format(ta)
+        )
+        with pytest.raises(ValueError, match=error_msg):
+            self.tmodel(a=ta).get_impulse_response_parameters()
