@@ -21,13 +21,13 @@ jobs:
         pip install --upgrade pip
         pip install -e .[dev]
     - name: Formatting and linters
+    # TODO: add `pylint src` back in
       run: |
         black --check src tests setup.py --exclude openscm_twolayermodel/_version.py
         isort --check-only --quiet --recursive src tests setup.py
         pydocstyle src
         bandit -c .bandit.yml -r openscm_twolayermodel
         flake8 src tests setup.py
-        pylint src
     - name: Build docs
       # treat warnings as errors (-W)...
       # ...but not when being nitpicky (-n)
