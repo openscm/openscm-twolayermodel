@@ -115,9 +115,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         )
         assert str(expected.units) == "watt / meter ** 2"
 
-        res = helper._calculate_next_rndt(
-            ttemp1, ttemp_2, terf, tefficacy
-        )
+        res = helper._calculate_next_rndt(ttemp1, ttemp_2, terf, tefficacy)
 
         npt.assert_allclose(res, expected.magnitude)
 
