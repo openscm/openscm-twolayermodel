@@ -93,7 +93,7 @@ class ImpulseResponseModel(
 
     @d1.setter
     def d1(self, val):
-        self._check_is_pint_quantity(val, "d1", self._d1_unit)
+        self._assert_is_pint_quantity_with_units(val, "d1", self._d1_unit)
         self._d1 = val
         self._d1_mag = val.to(self._d1_unit).magnitude
 
@@ -107,7 +107,7 @@ class ImpulseResponseModel(
 
     @d2.setter
     def d2(self, val):
-        self._check_is_pint_quantity(val, "d2", self._d2_unit)
+        self._assert_is_pint_quantity_with_units(val, "d2", self._d2_unit)
         self._d2 = val
         self._d2_mag = val.to(self._d2_unit).magnitude
 
@@ -121,7 +121,7 @@ class ImpulseResponseModel(
 
     @q1.setter
     def q1(self, val):
-        self._check_is_pint_quantity(val, "q1", self._q1_unit)
+        self._assert_is_pint_quantity_with_units(val, "q1", self._q1_unit)
         self._q1 = val
         self._q1_mag = val.to(self._q1_unit).magnitude
 
@@ -135,7 +135,7 @@ class ImpulseResponseModel(
 
     @q2.setter
     def q2(self, val):
-        self._check_is_pint_quantity(val, "q2", self._q2_unit)
+        self._assert_is_pint_quantity_with_units(val, "q2", self._q2_unit)
         self._q2 = val
         self._q2_mag = val.to(self._q2_unit).magnitude
 
@@ -149,7 +149,7 @@ class ImpulseResponseModel(
 
     @efficacy.setter
     def efficacy(self, val):
-        self._check_is_pint_quantity(val, "efficacy", self._efficacy_unit)
+        self._assert_is_pint_quantity_with_units(val, "efficacy", self._efficacy_unit)
         self._efficacy = val
         self._efficacy_mag = val.to(self._efficacy_unit).magnitude
 
@@ -230,7 +230,7 @@ class ImpulseResponseModel(
             t1_h = t1 * ur(self._temp1_unit)
             t2_h = t2 * ur(self._temp2_unit)
             efficacy_term = (
-                two_layer_paras["eta"] * (efficacy - 1) * ((1 - gh["phi1"]) * t1_h - (1 - gh["phi1"]) * t2_h)
+                two_layer_paras["eta"] * (efficacy - 1) * ((1 - gh["phi1"]) * t1_h + (1 - gh["phi2"]) * t2_h)
             )
 
             if str(efficacy_term.units) != "watt / meter ** 2":

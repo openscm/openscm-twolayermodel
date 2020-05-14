@@ -26,7 +26,7 @@ class Model(ABC):
     _name = None  # model name
 
     @staticmethod
-    def _check_is_pint_quantity(quantity, name, model_units):
+    def _assert_is_pint_quantity_with_units(quantity, name, model_units):
         if not isinstance(quantity, pint.Quantity):
             raise TypeError("{} must be a pint.Quantity".format(name))
 
@@ -92,7 +92,7 @@ class TwoLayerVariant(Model):
 
     @delta_t.setter
     def delta_t(self, val):
-        self._check_is_pint_quantity(val, "delta_t", self._delta_t_unit)
+        self._assert_is_pint_quantity_with_units(val, "delta_t", self._delta_t_unit)
         self._delta_t = val
         self._delta_t_mag = val.to(self._delta_t_unit).magnitude
 
@@ -106,7 +106,7 @@ class TwoLayerVariant(Model):
 
     @erf.setter
     def erf(self, val):
-        self._check_is_pint_quantity(val, "erf", self._erf_unit)
+        self._assert_is_pint_quantity_with_units(val, "erf", self._erf_unit)
         self._erf = val
         self._erf_mag = val.to(self._erf_unit).magnitude
 

@@ -86,7 +86,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     @du.setter
     def du(self, val):
-        self._check_is_pint_quantity(val, "du", self._du_unit)
+        self._assert_is_pint_quantity_with_units(val, "du", self._du_unit)
         self._du = val
         self._du_mag = val.to(self._du_unit).magnitude
         self._heat_capacity_upper_mag = self.heat_capacity_upper.to(
@@ -111,7 +111,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     @dl.setter
     def dl(self, val):
-        self._check_is_pint_quantity(val, "dl", self._dl_unit)
+        self._assert_is_pint_quantity_with_units(val, "dl", self._dl_unit)
         self._dl = val
         self._dl_mag = val.to(self._dl_unit).magnitude
         self._heat_capacity_lower_mag = self.heat_capacity_lower.to(
@@ -136,7 +136,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     @lambda_0.setter
     def lambda_0(self, val):
-        self._check_is_pint_quantity(val, "lambda_0", self._lambda_0_unit)
+        self._assert_is_pint_quantity_with_units(val, "lambda_0", self._lambda_0_unit)
         self._lambda_0 = val
         self._lambda_0_mag = val.to(self._lambda_0_unit).magnitude
 
@@ -150,7 +150,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     @a.setter
     def a(self, val):
-        self._check_is_pint_quantity(val, "a", self._a_unit)
+        self._assert_is_pint_quantity_with_units(val, "a", self._a_unit)
         self._a = val
         self._a_mag = val.to(self._a_unit).magnitude
 
@@ -164,7 +164,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     @efficacy.setter
     def efficacy(self, val):
-        self._check_is_pint_quantity(val, "efficacy", self._efficacy_unit)
+        self._assert_is_pint_quantity_with_units(val, "efficacy", self._efficacy_unit)
         self._efficacy = val
         self._efficacy_mag = val.to(self._efficacy_unit).magnitude
 
@@ -178,7 +178,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     @eta.setter
     def eta(self, val):
-        self._check_is_pint_quantity(val, "eta", self._eta_unit)
+        self._assert_is_pint_quantity_with_units(val, "eta", self._eta_unit)
         self._eta = val
         self._eta_mag = val.to(self._eta_unit).magnitude
 

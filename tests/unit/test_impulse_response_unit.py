@@ -5,6 +5,7 @@ from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import ImpulseResponseModel, TwoLayerModel
+from openscm_twolayermodel.base import _calculate_geoffroy_helper_parameters
 from openscm_twolayermodel.constants import density_water, heat_capacity_water
 
 
@@ -106,13 +107,21 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         phicoeff = C / (2 * helper_twolayer.efficacy * helper_twolayer.eta)
         phi1 = phicoeff * (b_star - delta ** 0.5)
         phi2 = phicoeff * (b_star + delta ** 0.5)
+
+        gh = _calculate_geoffroy_helper_parameters(
+            helper_twolayer.du,
+            helper_twolayer.dl,
+            helper_twolayer.lambda_0,
+            helper_twolayer.efficacy,
+            helper_twolayer.eta,
+        )
         # see notebook for discussion of why this is so
         efficacy_term = (
             helper_twolayer.eta
             * (helper_twolayer.efficacy - 1)
             * (
-                (1 - phi1) * ttemp_1 * ur("delta_degC")
-                - (1 - phi2) * ttemp_2 * ur("delta_degC")
+                ((1 - phi1) * ttemp_1 * ur("delta_degC"))
+                + ((1 - phi2) * ttemp_2 * ur("delta_degC"))
             )
         )
 
