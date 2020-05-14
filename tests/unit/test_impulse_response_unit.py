@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.testing as npt
+import pytest
 from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
@@ -23,8 +24,8 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         init_kwargs = dict(
             q1=0.3 * ur("delta_degC/(W/m^2)"),
             q2=0.4 * ur("delta_degC/(W/m^2)"),
-            d1=250.0 * ur("yr"),
-            d2=3 * ur("yr"),
+            d1=25.0 * ur("yr"),
+            d2=300 * ur("yr"),
             efficacy=1.1 * ur("dimensionless"),
             delta_t=1 / 12 * ur("yr"),
         )
@@ -38,6 +39,16 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         assert np.isnan(res._temp1_mag)
         assert np.isnan(res._temp2_mag)
         assert np.isnan(res._rndt_mag)
+
+    def test_init_backwards_timescales_error(self):
+        init_kwargs = dict(
+            d1=250.0 * ur("yr"),
+            d2=3 * ur("yr"),
+        )
+
+        error_msg = "The short-timescale must be d1"
+        with pytest.raises(ValueError, match=error_msg):
+            self.tmodel(**init_kwargs)
 
     def test_calculate_next_temp(self, check_same_unit):
         tdelta_t = 30 * 24 * 60 * 60
@@ -73,8 +84,6 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         terf = 1.2
         tefficacy = 1.13
 
-        res = self.tmodel._calculate_next_rndt(ttemp_1, ttemp_2, terf, tq1, tq2, td1, td2, tefficacy)
-
         helper = self.tmodel(
             q1=tq1 * ur("delta_degC/(W/m^2)"),
             q2=tq2 * ur("delta_degC/(W/m^2)"),
@@ -82,7 +91,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             d2=td2 * ur("yr"),
             efficacy=tefficacy * ur("dimensionless"),
         )
-        helper_twolayer = TwoLayerModel(**self.tmodel.get_two_layer_parameters())
+        helper_twolayer = TwoLayerModel(**helper.get_two_layer_parameters())
 
         C = helper_twolayer.heat_capacity_upper
         C_D = helper_twolayer.heat_capacity_lower
@@ -93,7 +102,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         b_star = b_pt_1 - b_pt_2
         delta = b**2 - (4 * helper_twolayer.lambda_0 * helper_twolayer.eta) / (C * C_D)
 
-        phicoeff = C / (2 * helper_twolayer.epsilon * helper_twolayer.eta)
+        phicoeff = C / (2 * helper_twolayer.efficacy * helper_twolayer.eta)
         phi1 = phicoeff * (b_star - delta**0.5)
         phi2 = phicoeff * (b_star + delta**0.5)
         # see notebook for discussion of why this is so
@@ -105,17 +114,21 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
                 - (1 - phi2) * ttemp_2 * ur("delta_degC")
             )
         )
-        expected = (
-            terf
-            - (ttemp_1 + ttemp_2) * helper_twolayer.lambda_0
-            - efficacy_term
-        ).magnitude
 
-        npt.assert_allclose(res, expected)
+        expected = (
+            terf * ur(helper._erf_unit)
+            - ((ttemp_1 + ttemp_2) * ur(helper._temp1_unit)) * helper_twolayer.lambda_0
+            - efficacy_term
+        )
+        assert str(expected.units) == "watt / meter ** 2"
+
+        res = helper._calculate_next_rndt(ttemp_1, ttemp_2, terf, tq1, tq2, td1, td2, tefficacy)
+
+        npt.assert_allclose(res, expected.magnitude)
 
         # check internal units make sense
         check_same_unit(self.tmodel._q1_unit, self.tmodel._q2_unit)
-        check_same_unit(helper_twolayer._lambda_0_unit, self.tmodel._q2_unit)
+        check_same_unit(helper_twolayer._lambda_0_unit, (1.0 * ur(self.tmodel._q2_unit)**-1))
         check_same_unit(
             self.tmodel._erf_unit,
             (
@@ -173,11 +186,14 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         npt.assert_equal(
             model._rndt_mag[model._timestep_idx],
             model._calculate_next_rndt(
-                model._temp1_mag[model._timestep_idx - 1]
-                + model._temp2_mag[model._timestep_idx - 1],
+                model._temp1_mag[model._timestep_idx - 1],
+                model._temp2_mag[model._timestep_idx - 1],
                 model._erf_mag[model._timestep_idx - 1],
                 model._q1_mag,
                 model._q2_mag,
+                model._d1_mag,
+                model._d2_mag,
+                model._efficacy_mag,
             ),
         )
 
