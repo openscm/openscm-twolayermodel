@@ -9,6 +9,7 @@ from test_model_base import TwoLayerVariantTester
 from openscm_twolayermodel import TwoLayerModel
 from openscm_twolayermodel.constants import density_water, heat_capacity_water
 
+
 class TestTwoLayerModel(TwoLayerVariantTester):
     tmodel = TwoLayerModel
 
@@ -357,7 +358,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         tdl = 3200 * ur("m")
         tlambda_0 = 4 / 3 * ur("W/m^2/delta_degC")
         tefficacy = 1.1 * ur("dimensionless")
-        teta=0.7 * ur("W/m^2/delta_degC")
+        teta = 0.7 * ur("W/m^2/delta_degC")
 
         mod_instance = self.tmodel(
             du=tdu,
@@ -375,16 +376,16 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
         b = (tlambda_0 + tefficacy * teta) / C + teta / C_D
         b_star = (tlambda_0 + tefficacy * teta) / C - teta / C_D
-        delta = b**2 - 4 * tlambda_0 * teta / (C * C_D)
+        delta = b ** 2 - 4 * tlambda_0 * teta / (C * C_D)
 
-        tau1 = C * C_D / (2 * tlambda_0 * teta) * (b - delta**0.5)
-        tau2 = C * C_D / (2 * tlambda_0 * teta) * (b + delta**0.5)
-        phi1 = C / (2 * tefficacy * teta) * (b_star - delta**0.5)
-        phi2 = C / (2 * tefficacy * teta) * (b_star + delta**0.5)
+        tau1 = C * C_D / (2 * tlambda_0 * teta) * (b - delta ** 0.5)
+        tau2 = C * C_D / (2 * tlambda_0 * teta) * (b + delta ** 0.5)
+        phi1 = C / (2 * tefficacy * teta) * (b_star - delta ** 0.5)
+        phi2 = C / (2 * tefficacy * teta) * (b_star + delta ** 0.5)
 
         expected = {
-            "q1": tau1 * phi2 / (C*(phi2 - phi1)),
-            "q2": -tau2 * phi1 / (C*(phi2 - phi1)),
+            "q1": tau1 * phi2 / (C * (phi2 - phi1)),
+            "q2": -tau2 * phi1 / (C * (phi2 - phi1)),
             "d1": tau1,
             "d2": tau2,
             "efficacy": tefficacy,

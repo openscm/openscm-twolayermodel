@@ -41,10 +41,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         assert np.isnan(res._rndt_mag)
 
     def test_init_backwards_timescales_error(self):
-        init_kwargs = dict(
-            d1=250.0 * ur("yr"),
-            d2=3 * ur("yr"),
-        )
+        init_kwargs = dict(d1=250.0 * ur("yr"), d2=3 * ur("yr"),)
 
         error_msg = "The short-timescale must be d1"
         with pytest.raises(ValueError, match=error_msg):
@@ -96,15 +93,19 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         C = helper_twolayer.heat_capacity_upper
         C_D = helper_twolayer.heat_capacity_lower
 
-        b_pt_1 = (helper_twolayer.lambda_0 + helper_twolayer.efficacy * helper_twolayer.eta) / (C)
+        b_pt_1 = (
+            helper_twolayer.lambda_0 + helper_twolayer.efficacy * helper_twolayer.eta
+        ) / (C)
         b_pt_2 = (helper_twolayer.eta) / (C_D)
         b = b_pt_1 + b_pt_2
         b_star = b_pt_1 - b_pt_2
-        delta = b**2 - (4 * helper_twolayer.lambda_0 * helper_twolayer.eta) / (C * C_D)
+        delta = b ** 2 - (4 * helper_twolayer.lambda_0 * helper_twolayer.eta) / (
+            C * C_D
+        )
 
         phicoeff = C / (2 * helper_twolayer.efficacy * helper_twolayer.eta)
-        phi1 = phicoeff * (b_star - delta**0.5)
-        phi2 = phicoeff * (b_star + delta**0.5)
+        phi1 = phicoeff * (b_star - delta ** 0.5)
+        phi2 = phicoeff * (b_star + delta ** 0.5)
         # see notebook for discussion of why this is so
         efficacy_term = (
             helper_twolayer.eta
@@ -122,13 +123,17 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         )
         assert str(expected.units) == "watt / meter ** 2"
 
-        res = helper._calculate_next_rndt(ttemp_1, ttemp_2, terf, tq1, tq2, td1, td2, tefficacy)
+        res = helper._calculate_next_rndt(
+            ttemp_1, ttemp_2, terf, tq1, tq2, td1, td2, tefficacy
+        )
 
         npt.assert_allclose(res, expected.magnitude)
 
         # check internal units make sense
         check_same_unit(self.tmodel._q1_unit, self.tmodel._q2_unit)
-        check_same_unit(helper_twolayer._lambda_0_unit, (1.0 * ur(self.tmodel._q2_unit)**-1))
+        check_same_unit(
+            helper_twolayer._lambda_0_unit, (1.0 * ur(self.tmodel._q2_unit) ** -1)
+        )
         check_same_unit(
             self.tmodel._erf_unit,
             (
@@ -138,8 +143,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             ),
         )
         check_same_unit(
-            self.tmodel._erf_unit,
-            efficacy_term.units,
+            self.tmodel._erf_unit, efficacy_term.units,
         )
 
     def test_step(self):
@@ -245,19 +249,13 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         assert_is_nan_and_erf_shape(model._rndt_mag)
 
     def test_get_two_layer_model_parameters(self, check_equal_pint):
-        tq1=0.3 * ur("delta_degC/(W/m^2)")
-        tq2=0.4 * ur("delta_degC/(W/m^2)")
-        td1=3 * ur("yr")
-        td2=300.0 * ur("yr")
-        tefficacy=1.2 * ur("dimensionless")
+        tq1 = 0.3 * ur("delta_degC/(W/m^2)")
+        tq2 = 0.4 * ur("delta_degC/(W/m^2)")
+        td1 = 3 * ur("yr")
+        td2 = 300.0 * ur("yr")
+        tefficacy = 1.2 * ur("dimensionless")
 
-        start_paras = dict(
-            d1=td1,
-            d2=td2,
-            q1=tq1,
-            q2=tq2,
-            efficacy=tefficacy,
-        )
+        start_paras = dict(d1=td1, d2=td2, q1=tq1, q2=tq2, efficacy=tefficacy,)
 
         mod_instance = self.tmodel(**start_paras)
 
