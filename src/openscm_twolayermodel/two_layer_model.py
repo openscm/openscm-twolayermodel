@@ -336,3 +336,37 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
                 "Cannot calculate impulse response parameters with "
                 "non-zero a={}".format(self.a)
             )
+
+        C = self.heat_capacity_upper
+        C_D = self.heat_capacity_lower
+
+        b_pt_1 = (self.lambda_0 + self.efficacy * self.eta) / (C)
+        b_pt_2 = (self.eta) / (C_D)
+        b = b_pt_1 + b_pt_2
+        b_star = b_pt_1 - b_pt_2
+        delta = b**2 - (4 * self.lambda_0 * self.eta) / (C * C_D)
+
+        taucoeff = C * C_D / (2 * self.lambda_0 * self.eta)
+        tau1 = taucoeff * (b - delta ** 0.5)
+        tau2 = taucoeff * (b + delta ** 0.5)
+
+        d1 = tau1
+        d2 = tau2
+
+        phicoeff = C / (2 * self.efficacy * self.eta)
+        phi1 = phicoeff * (b_star - delta**0.5)
+        phi2 = phicoeff * (b_star + delta**0.5)
+
+        qdenom = C * (phi2 - phi1)
+        q1 = tau1 * phi2 / qdenom
+        q2 = - tau2 * phi1 / qdenom
+
+        out = {
+            "d1": d1,
+            "d2": d2,
+            "q1": q1,
+            "q2": q2,
+            "efficacy": self.efficacy,
+        }
+
+        return out
