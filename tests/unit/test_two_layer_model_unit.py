@@ -8,7 +8,7 @@ from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import TwoLayerModel
 from openscm_twolayermodel.base import _calculate_geoffroy_helper_parameters
-from openscm_twolayermodel.constants import density_water, heat_capacity_water
+from openscm_twolayermodel.constants import DENSITY_WATER, HEAT_CAPACITY_WATER
 
 
 class TestTwoLayerModel(TwoLayerVariantTester):
@@ -48,7 +48,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     def test_heat_capacity_upper(self, check_equal_pint):
         model = self.tmodel(du=50000 * ur("mm"))
 
-        expected = model.du * density_water * heat_capacity_water
+        expected = model.du * DENSITY_WATER * HEAT_CAPACITY_WATER
 
         res = model.heat_capacity_upper
 
@@ -66,7 +66,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     def test_heat_capacity_lower(self, check_equal_pint):
         model = self.tmodel(dl=2.5 * ur("km"))
 
-        expected = model.dl * density_water * heat_capacity_water
+        expected = model.dl * DENSITY_WATER * HEAT_CAPACITY_WATER
 
         res = model.heat_capacity_lower
 
@@ -421,8 +421,8 @@ def test_calculate_geoffroy_helper_parameters(check_equal_pint):
 
     # for explanation of what is going on, see
     # impulse-response-equivalence.ipynb
-    C = density_water * heat_capacity_water * tdu
-    C_D = density_water * heat_capacity_water * tdl
+    C = DENSITY_WATER * HEAT_CAPACITY_WATER * tdu
+    C_D = DENSITY_WATER * HEAT_CAPACITY_WATER * tdl
 
     b = (tlambda0 + tefficacy * teta) / C + teta / C_D
     b_star = (tlambda0 + tefficacy * teta) / C - teta / C_D

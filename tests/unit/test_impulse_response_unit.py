@@ -6,7 +6,7 @@ from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import ImpulseResponseModel, TwoLayerModel
 from openscm_twolayermodel.base import _calculate_geoffroy_helper_parameters
-from openscm_twolayermodel.constants import density_water, heat_capacity_water
+from openscm_twolayermodel.constants import DENSITY_WATER, HEAT_CAPACITY_WATER
 
 
 class TestImpulseResponseModel(TwoLayerVariantTester):
@@ -267,8 +267,8 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
 
         expected = {
             "lambda0": lambda0,
-            "du": C / (density_water * heat_capacity_water),
-            "dl": C_D / (density_water * heat_capacity_water),
+            "du": C / (DENSITY_WATER * HEAT_CAPACITY_WATER),
+            "dl": C_D / (DENSITY_WATER * HEAT_CAPACITY_WATER),
             "eta": eta,
             "efficacy": efficacy,
         }

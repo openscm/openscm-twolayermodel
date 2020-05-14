@@ -8,7 +8,7 @@ import numpy as np
 from openscm_units import unit_registry as ur
 
 from .base import TwoLayerVariant, _calculate_geoffroy_helper_parameters
-from .constants import density_water, heat_capacity_water
+from .constants import DENSITY_WATER, HEAT_CAPACITY_WATER
 from .errors import ModelStateError
 
 # pylint: disable=invalid-name
@@ -82,6 +82,7 @@ class ImpulseResponseModel(
         self._temp1_mag = np.zeros(1) * np.nan
         self._temp2_mag = np.zeros(1) * np.nan
         self._rndt_mag = np.zeros(1) * np.nan
+        self._timestep_idx = np.nan
 
     @property
     def d1(self):
@@ -202,10 +203,6 @@ class ImpulseResponseModel(
                 self._temp1_mag[self._timestep_idx - 1],
                 self._temp2_mag[self._timestep_idx - 1],
                 self._erf_mag[self._timestep_idx - 1],
-                self._q1_mag,
-                self._q2_mag,
-                self._d1_mag,
-                self._d2_mag,
                 self._efficacy_mag,
             )
 
@@ -216,7 +213,7 @@ class ImpulseResponseModel(
 
         return t * decay_factor + rise
 
-    def _calculate_next_rndt(self, t1, t2, erf, q1, q2, d1, d2, efficacy):
+    def _calculate_next_rndt(self, t1, t2, erf, efficacy):
         two_layer_paras = self.get_two_layer_parameters()
         lambda0 = two_layer_paras["lambda0"]
 
@@ -284,7 +281,7 @@ class ImpulseResponseModel(
 
         return out_run_tss
 
-    def get_two_layer_parameters(self):
+    def get_two_layer_parameters(self):  # pylint:disable=missing-return-doc,missing-return-type-doc
         """
         Get equivalent two-layer model parameters
 
@@ -308,8 +305,8 @@ class ImpulseResponseModel(
         C_D = (lambda0 * (self.d1 * a1 + self.d2 * a2) - C) / self.efficacy
         eta = C_D / (self.d1 * a2 + self.d2 * a1)
 
-        du = C / (density_water * heat_capacity_water)
-        dl = C_D / (density_water * heat_capacity_water)
+        du = C / (DENSITY_WATER * HEAT_CAPACITY_WATER)
+        dl = C_D / (DENSITY_WATER * HEAT_CAPACITY_WATER)
 
         out = {
             "lambda0": lambda0,

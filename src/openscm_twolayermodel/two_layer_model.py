@@ -5,7 +5,7 @@ import numpy as np
 from openscm_units import unit_registry as ur
 
 from .base import TwoLayerVariant, _calculate_geoffroy_helper_parameters
-from .constants import density_water, heat_capacity_water
+from .constants import DENSITY_WATER, HEAT_CAPACITY_WATER
 from .errors import ModelStateError
 
 # pylint: disable=invalid-name
@@ -75,6 +75,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         self._temp_upper_mag = np.zeros(1) * np.nan
         self._temp_lower_mag = np.zeros(1) * np.nan
         self._rndt_mag = np.zeros(1) * np.nan
+        self._timestep_idx = np.nan
 
     @property
     def du(self):
@@ -99,7 +100,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         :obj:`pint.Quantity`
             Heat capacity of upper layer
         """
-        return self.du * density_water * heat_capacity_water
+        return self.du * DENSITY_WATER * HEAT_CAPACITY_WATER
 
     @property
     def dl(self):
@@ -124,7 +125,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         :obj:`pint.Quantity`
             Heat capacity of lower layer
         """
-        return self.dl * density_water * heat_capacity_water
+        return self.dl * DENSITY_WATER * HEAT_CAPACITY_WATER
 
     @property
     def lambda0(self):
@@ -305,7 +306,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
         return out_run_tss
 
-    def get_impulse_response_parameters(self):
+    def get_impulse_response_parameters(self):  # pylint:disable=missing-return-doc
         """
         Get equivalent two-timescale impulse response model parameters
 
