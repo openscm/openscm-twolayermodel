@@ -15,7 +15,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     parameters = dict(
         du=40 * ur("m"),
         dl=1300 * ur("m"),
-        lambda_0=-3.4 / 3 * ur("W/m^2/delta_degC"),
+        lambda_0=3.4 / 3 * ur("W/m^2/delta_degC"),
         a=0.01 * ur("W/m^2/delta_degC^2"),
         efficacy=1.1 * ur("dimensionless"),
         eta=0.7 * ur("W/m^2/delta_degC"),
@@ -26,7 +26,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         init_kwargs = dict(
             du=10 * ur("m"),
             dl=2200 * ur("m"),
-            lambda_0=-4 / 3 * ur("W/m^2/delta_degC"),
+            lambda_0=4 / 3 * ur("W/m^2/delta_degC"),
             a=0.1 * ur("W/m^2/delta_degC^2"),
             efficacy=1.1 * ur("dimensionless"),
             eta=0.7 * ur("W/m^2/delta_degC"),
@@ -84,7 +84,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         ttemp_upper = 0.1
         ttemp_lower = 0.2
         terf = 1.1
-        tlambda_0 = -3.7 / 3
+        tlambda_0 = 3.7 / 3
         ta = 0.02
         tefficacy = 0.9
         teta = 0.78
@@ -355,7 +355,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     def test_get_impulse_response_parameters(self):
         tdu = 35 * ur("m")
         tdl = 3200 * ur("m")
-        tlambda_0=-4 / 3 * ur("W/m^2/delta_degC")
+        tlambda_0=4 / 3 * ur("W/m^2/delta_degC")
         tefficacy=1.1 * ur("dimensionless")
         teta=0.7 * ur("W/m^2/delta_degC")
 
@@ -384,7 +384,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
         expected = {
             "q1": tau1 * phi2 / (C*(phi2 - phi1)),
-            "q2": tau2 * phi1 / (C*(phi2 - phi1)),
+            "q2": -tau2 * phi1 / (C*(phi2 - phi1)),
             "d1": tau1,
             "d2": tau2,
             "efficacy": tefficacy,
