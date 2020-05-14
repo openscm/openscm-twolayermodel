@@ -263,6 +263,7 @@ class TwoLayerVariant(Model):
 
     @abstractmethod
     def _get_run_output_tss(self, ts_base):
+        """Get the run output timeseries as a list"""
         pass
 
 
