@@ -39,6 +39,16 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
     _temp2_unit = "delta_degC"
     _rndt_unit = "W/m^2"
 
+    _save_paras = (  # parameters to save when doing a run
+        "d1",
+        "d2",
+        "q1",
+        "q2",
+        "efficacy",
+    )
+
+    _name = "two_timescale_impulse_response"  # model name
+
     def __init__(
         self,
         q1=0.3 * ur("delta_degC/(W/m^2)"),
