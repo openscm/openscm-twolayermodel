@@ -43,13 +43,18 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
         self,
         q1=0.3 * ur("delta_degC/(W/m^2)"),
         q2=0.4 * ur("delta_degC/(W/m^2)"),
-        d1=250.0 * ur("yr"),
-        d2=3 * ur("yr"),
+        d1=9.0 * ur("yr"),
+        d2=400.0 * ur("yr"),
         efficacy=1.0 * ur("dimensionless"),
         delta_t=1 / 12 * ur("yr"),
     ):  # pylint: disable=too-many-arguments
         """
         Initialise
+
+        Raises
+        ------
+        ValueError
+            d1 >= d2, d1 must be the short-timescale
         """
         self.q1 = q1
         self.q2 = q2
@@ -57,6 +62,9 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
         self.d2 = d2
         self.efficacy = efficacy
         self.delta_t = delta_t
+
+        if (d1 >= d2):
+            raise ValueError("The short-timescale must be d1")
 
         self._erf = np.zeros(1) * np.nan
         self._temp1_mag = np.zeros(1) * np.nan
@@ -179,11 +187,14 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
             )
 
             self._rndt_mag[self._timestep_idx] = self._calculate_next_rndt(
-                self._temp1_mag[self._timestep_idx - 1]
-                + self._temp2_mag[self._timestep_idx - 1],
+                self._temp1_mag[self._timestep_idx - 1],
+                self._temp2_mag[self._timestep_idx - 1],
                 self._erf_mag[self._timestep_idx - 1],
                 self._q1_mag,
                 self._q2_mag,
+                self._d1_mag,
+                self._d2_mag,
+                self._efficacy_mag,
             )
 
     @staticmethod
@@ -193,9 +204,38 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
 
         return t * decay_factor + rise
 
-    @staticmethod
-    def _calculate_next_rndt(t, erf, q1, q2):
-        return erf - t / (q1 + q2)
+    def _calculate_next_rndt(self, t1, t2, erf, q1, q2, d1, d2, efficacy):
+        two_layer_paras = self.get_two_layer_parameters()
+        lambda_0 = two_layer_paras["lambda_0"]
+
+        if np.equal(efficacy, 1):
+            efficacy_term = 0 * ur(self._erf_unit)
+        else:
+            eta = two_layer_paras["eta"]
+
+            C = two_layer_paras["du"] / (heat_capacity_water * density_water)
+            C_D = two_layer_paras["dl"] / (heat_capacity_water * density_water)
+
+            b_pt_1 = (lambda_0 + efficacy * eta) / C
+            b_pt_2 = eta / C_D
+            b = b_pt_1 + b_pt_2
+            b_star = b_pt_1 - b_pt_2
+            delta = b**2 - (4 * lambda_0 * eta) / (C * C_D)
+
+            phicoeff = C / (2 * efficacy * eta)
+            phi1 = phicoeff * (b_star - delta**0.5)
+            phi2 = phicoeff * (b_star + delta**0.5)
+
+            t1_h = t1 * ur(self._temp1_unit)
+            t2_h = t2 * ur(self._temp2_unit)
+            efficacy_term = eta * (efficacy - 1) * ((1 - phi1) * t1_h - (1 - phi2) * t2_h)
+
+            if str(efficacy_term.units) != "watt / meter ** 2":
+                raise AssertionError("units should have come out as W/m^2")
+
+        out = (erf - lambda_0.magnitude * (t1 + t2) - efficacy_term.magnitude)
+
+        return out
 
     def _get_run_output_tss(self, ts_base):
         out_run_tss = []
