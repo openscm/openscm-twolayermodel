@@ -5,6 +5,7 @@ import numpy as np
 from openscm_units import unit_registry as ur
 
 from .base import TwoLayerVariant
+from .constants import density_water, heat_capacity_water
 from .errors import ModelStateError
 
 # pylint: disable=invalid-name
@@ -21,12 +22,6 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
     values will always be zero and the last value in the input drivers has no
     effect on model output.
     """
-
-    density_water = 1000 * ur("kg/m^3")
-    """:obj:`pint.Quantity` : density of water"""
-
-    heat_capacity_water = 4181 * ur("J/delta_degC/kg")
-    """:obj:`pint.Quantity` : heat capacity of water"""
 
     _du_unit = "m"
     _heat_capacity_upper_unit = "J/delta_degC/m^2"
@@ -104,7 +99,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         :obj:`pint.Quantity`
             Heat capacity of upper layer
         """
-        return self.du * self.density_water * self.heat_capacity_water
+        return self.du * density_water * heat_capacity_water
 
     @property
     def dl(self):
@@ -129,7 +124,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         :obj:`pint.Quantity`
             Heat capacity of lower layer
         """
-        return self.dl * self.density_water * self.heat_capacity_water
+        return self.dl * density_water * heat_capacity_water
 
     @property
     def lambda_0(self):
@@ -312,7 +307,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     def get_impulse_response_parameters(self):
         """
-        Get equivalent two-layer impulse response model parameters
+        Get equivalent two-timescale impulse response model parameters
 
         For details on how the equivalence is calculated, please see the notebook
         ``impulse-response-equivalence.ipynb`` in the `OpenSCM Two Layer model

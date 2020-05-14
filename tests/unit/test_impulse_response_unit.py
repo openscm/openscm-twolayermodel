@@ -4,6 +4,7 @@ from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import ImpulseResponseModel, TwoLayerModel
+from openscm_twolayermodel.constants import density_water, heat_capacity_water
 
 
 class TestImpulseResponseModel(TwoLayerVariantTester):
@@ -228,11 +229,11 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         assert_is_nan_and_erf_shape(model._rndt_mag)
 
     def test_get_two_layer_model_parameters(self, check_equal_pint):
-        tq1=0.3 * ur("delta_degC/(W/m^2)"),
-        tq2=0.4 * ur("delta_degC/(W/m^2)"),
-        td1=300.0 * ur("yr"),
-        td2=3 * ur("yr"),
-        tefficacy=1.2 * ur("dimensionless"),
+        tq1=0.3 * ur("delta_degC/(W/m^2)")
+        tq2=0.4 * ur("delta_degC/(W/m^2)")
+        td1=3 * ur("yr")
+        td2=300.0 * ur("yr")
+        tefficacy=1.2 * ur("dimensionless")
 
         start_paras = dict(
             d1=td1,
@@ -260,18 +261,17 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
 
         expected = {
             "lambda_0": lambda_0,
-            "du": C / (TwoLayerModel.density_water * TwoLayerModel.heat_capacity_water),
-            "dl": C_D / (TwoLayerModel.density_water * TwoLayerModel.heat_capacity_water),
+            "du": C / (density_water * heat_capacity_water),
+            "dl": C_D / (density_water * heat_capacity_water),
             "eta": eta,
             "efficacy": efficacy,
         }
-
-        a1 = tlambda_0 * expected["q1"]
-        a2 = tlambda_0 * expected["q2"]
 
         res = mod_instance.get_two_layer_parameters()
 
         assert res == expected
 
         # check circularity
-        assert TwoLayerModel(**res).get_impulse_response_parameters() == start_paras
+        circular_params = TwoLayerModel(**res).get_impulse_response_parameters()
+        for k, v in circular_params.items():
+            check_equal_pint(v, start_paras[k])

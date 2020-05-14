@@ -29,6 +29,7 @@ OpenSCM Two Layer Model
     base
     impulse_response_model
     two_layer_model
+    constants
     errors
     utils
 

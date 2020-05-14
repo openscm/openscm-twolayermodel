@@ -8,6 +8,7 @@ import numpy as np
 from openscm_units import unit_registry as ur
 
 from .base import TwoLayerVariant
+from .constants import density_water, heat_capacity_water
 from .errors import ModelStateError
 
 # pylint: disable=invalid-name
@@ -29,6 +30,7 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
     _d2_unit = "yr"
     _q1_unit = "delta_degC/(W/m^2)"
     _q2_unit = "delta_degC/(W/m^2)"
+    _efficacy_unit = "dimensionless"
     _delta_t_unit = "yr"
 
     _erf_unit = "W/m^2"
@@ -43,6 +45,7 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
         q2=0.4 * ur("delta_degC/(W/m^2)"),
         d1=250.0 * ur("yr"),
         d2=3 * ur("yr"),
+        efficacy=1.0 * ur("dimensionless"),
         delta_t=1 / 12 * ur("yr"),
     ):  # pylint: disable=too-many-arguments
         """
@@ -52,6 +55,7 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
         self.q2 = q2
         self.d1 = d1
         self.d2 = d2
+        self.efficacy = efficacy
         self.delta_t = delta_t
 
         self._erf = np.zeros(1) * np.nan
@@ -114,6 +118,20 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
         self._check_is_pint_quantity(val, "q2", self._q2_unit)
         self._q2 = val
         self._q2_mag = val.to(self._q2_unit).magnitude
+
+    @property
+    def efficacy(self):
+        """
+        :obj:`pint.Quantity`
+            Efficacy factor
+        """
+        return self._efficacy
+
+    @efficacy.setter
+    def efficacy(self, val):
+        self._check_is_pint_quantity(val, "efficacy", self._efficacy_unit)
+        self._efficacy = val
+        self._efficacy_mag = val.to(self._efficacy_unit).magnitude
 
     def _reset(self):
         if np.isnan(self.erf).any():
@@ -216,3 +234,40 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
         )
 
         return out_run_tss
+
+    def get_two_layer_parameters(self):
+        """
+        Get equivalent two-layer model parameters
+
+        For details on how the equivalence is calculated, please see the notebook
+        ``impulse-response-equivalence.ipynb`` in the `OpenSCM Two Layer model
+        repository <github.com/openscm/openscm-twolayermodel>`_.
+
+        Returns
+        -------
+        dict of str : :obj:`pint.Quantity`
+            Input arguments to initialise an
+            :obj:`openscm_twolayermodel.TwoLayerModel` with the same
+            temperature response as ``self``
+        """
+        lambda_0 = 1 / (self.q1 + self.q2)
+        C = (self.d1 * self.d2) / (self.q1 * self.d2 + self.q2 * self.d1)
+
+        a1 = lambda_0 * self.q1
+        a2 = lambda_0 * self.q2
+
+        C_D = (lambda_0 * (self.d1 * a1 + self.d2 * a2) - C) / self.efficacy
+        eta = C_D / (self.d1 * a2 + self.d2 * a1)
+
+        du = C / (density_water * heat_capacity_water)
+        dl = C_D / (density_water * heat_capacity_water)
+
+        out = {
+            "lambda_0": lambda_0,
+            "du": du,
+            "dl": dl,
+            "eta": eta,
+            "efficacy": self.efficacy,
+        }
+
+        return out
