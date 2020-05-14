@@ -91,23 +91,6 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         )
         helper_twolayer = TwoLayerModel(**helper.get_two_layer_parameters())
 
-        C = helper_twolayer.heat_capacity_upper
-        C_D = helper_twolayer.heat_capacity_lower
-
-        b_pt1 = (
-            helper_twolayer.lambda0 + helper_twolayer.efficacy * helper_twolayer.eta
-        ) / (C)
-        b_pt2 = (helper_twolayer.eta) / (C_D)
-        b = b_pt1 + b_pt2
-        b_star = b_pt1 - b_pt2
-        delta = b ** 2 - (4 * helper_twolayer.lambda0 * helper_twolayer.eta) / (
-            C * C_D
-        )
-
-        phicoeff = C / (2 * helper_twolayer.efficacy * helper_twolayer.eta)
-        phi1 = phicoeff * (b_star - delta ** 0.5)
-        phi2 = phicoeff * (b_star + delta ** 0.5)
-
         gh = _calculate_geoffroy_helper_parameters(
             helper_twolayer.du,
             helper_twolayer.dl,
@@ -120,8 +103,8 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             helper_twolayer.eta
             * (helper_twolayer.efficacy - 1)
             * (
-                ((1 - phi1) * ttemp1 * ur("delta_degC"))
-                + ((1 - phi2) * ttemp_2 * ur("delta_degC"))
+                ((1 - gh["phi1"]) * ttemp1 * ur("delta_degC"))
+                + ((1 - gh["phi2"]) * ttemp_2 * ur("delta_degC"))
             )
         )
 

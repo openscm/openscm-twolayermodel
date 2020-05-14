@@ -224,13 +224,19 @@ class ImpulseResponseModel(
             efficacy_term = 0 * ur(self._erf_unit)
         else:
             gh = _calculate_geoffroy_helper_parameters(
-                two_layer_paras["du"], two_layer_paras["dl"], two_layer_paras["lambda0"], two_layer_paras["efficacy"], two_layer_paras["eta"]
+                two_layer_paras["du"],
+                two_layer_paras["dl"],
+                two_layer_paras["lambda0"],
+                two_layer_paras["efficacy"],
+                two_layer_paras["eta"],
             )
 
             t1_h = t1 * ur(self._temp1_unit)
             t2_h = t2 * ur(self._temp2_unit)
             efficacy_term = (
-                two_layer_paras["eta"] * (efficacy - 1) * ((1 - gh["phi1"]) * t1_h + (1 - gh["phi2"]) * t2_h)
+                two_layer_paras["eta"]
+                * (efficacy - 1)
+                * ((1 - gh["phi1"]) * t1_h + (1 - gh["phi2"]) * t2_h)
             )
 
             if str(efficacy_term.units) != "watt / meter ** 2":
