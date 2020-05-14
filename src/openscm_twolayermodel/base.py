@@ -280,9 +280,6 @@ def _calculate_geoffroy_helper_parameters(du, dl, lambda0, efficacy, eta):
     tau1 = taucoeff * (b - delta ** 0.5)
     tau2 = taucoeff * (b + delta ** 0.5)
 
-    d1 = tau1
-    d2 = tau2
-
     phicoeff = C / (2 * efficacy * eta)
     phi1 = phicoeff * (b_star - delta ** 0.5)
     phi2 = phicoeff * (b_star + delta ** 0.5)

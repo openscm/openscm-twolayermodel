@@ -417,24 +417,24 @@ def test_calculate_geoffroy_helper_parameters(check_equal_pint):
     tdl = 3200 * ur("m")
     tlambda0 = 4 / 3 * ur("W/m^2/delta_degC")
     tefficacy = 1.1 * ur("dimensionless")
-    teta=0.7 * ur("W/m^2/delta_degC")
+    teta = 0.7 * ur("W/m^2/delta_degC")
 
     # for explanation of what is going on, see
     # impulse-response-equivalence.ipynb
-    C = (density_water * heat_capacity_water * tdu)
-    C_D = (density_water * heat_capacity_water * tdl)
+    C = density_water * heat_capacity_water * tdu
+    C_D = density_water * heat_capacity_water * tdl
 
     b = (tlambda0 + tefficacy * teta) / C + teta / C_D
     b_star = (tlambda0 + tefficacy * teta) / C - teta / C_D
-    delta = b**2 - 4 * tlambda0 * teta / (C * C_D)
+    delta = b ** 2 - 4 * tlambda0 * teta / (C * C_D)
 
-    tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta**0.5)
-    tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta**0.5)
-    phi1 = C / (2 * tefficacy * teta) * (b_star - delta**0.5)
-    phi2 = C / (2 * tefficacy * teta) * (b_star + delta**0.5)
+    tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta ** 0.5)
+    tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta ** 0.5)
+    phi1 = C / (2 * tefficacy * teta) * (b_star - delta ** 0.5)
+    phi2 = C / (2 * tefficacy * teta) * (b_star + delta ** 0.5)
 
     a1 = phi2 * tau1 * tlambda0 / (C * (phi2 - phi1))
-    a2 = - phi1 * tau2 * tlambda0 / (C * (phi2 - phi1))
+    a2 = -phi1 * tau2 * tlambda0 / (C * (phi2 - phi1))
 
     expected = {
         "C": C,
@@ -460,8 +460,10 @@ def test_calculate_geoffroy_helper_parameters(check_equal_pint):
     check_equal_pint(C + phi1 * tefficacy * C_D, tlambda0 * tau1)
     check_equal_pint(C + phi2 * tefficacy * C_D, tlambda0 * tau2)
     check_equal_pint(phi1 * a1 + phi2 * a2, 1 * ur("dimensionless"))
-    check_equal_pint(phi1 * phi2 , - C / (tefficacy * C_D))
+    check_equal_pint(phi1 * phi2, -C / (tefficacy * C_D))
 
-    res = _calculate_geoffroy_helper_parameters(du=tdu, dl=tdl, lambda0=tlambda0, efficacy=tefficacy, eta=teta)
+    res = _calculate_geoffroy_helper_parameters(
+        du=tdu, dl=tdl, lambda0=tlambda0, efficacy=tefficacy, eta=teta
+    )
 
     assert res == expected
