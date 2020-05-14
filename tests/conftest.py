@@ -37,6 +37,11 @@ def test_twolayer_output_dir(test_data_root_dir):
     return os.path.join(test_data_root_dir, "two-layer-output")
 
 
+@pytest.fixture
+def test_impulseresponse_output_dir(test_data_root_dir):
+    return os.path.join(test_data_root_dir, "impulse-response-output")
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--update-expected-files",

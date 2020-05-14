@@ -59,7 +59,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         self,
         du=50 * ur("m"),
         dl=1200 * ur("m"),
-        lambda_0=-3.74 / 3 * ur("W/m^2/delta_degC"),
+        lambda_0=3.74 / 3 * ur("W/m^2/delta_degC"),
         a=0.0 * ur("W/m^2/delta_degC^2"),
         efficacy=1.0 * ur("dimensionless"),
         eta=0.8 * ur("W/m^2/delta_degC"),
@@ -250,9 +250,9 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
     def _calculate_next_temp_upper(  # pylint: disable=too-many-arguments
         delta_t, t_upper, t_lower, erf, lambda_0, a, efficacy, eta, heat_capacity_upper
     ):
-        lambda_now = lambda_0 + a * t_upper
+        lambda_now = lambda_0 - a * t_upper
         heat_exchange = efficacy * eta * (t_upper - t_lower)
-        dT_dt = (erf + lambda_now * t_upper - heat_exchange) / heat_capacity_upper
+        dT_dt = (erf - lambda_now * t_upper - heat_exchange) / heat_capacity_upper
 
         return t_upper + delta_t * dT_dt
 
