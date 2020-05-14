@@ -27,7 +27,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
     _heat_capacity_upper_unit = "J/delta_degC/m^2"
     _heat_capacity_lower_unit = "J/delta_degC/m^2"
     _dl_unit = "m"
-    _lambda_0_unit = "W/m^2/delta_degC"
+    _lambda0_unit = "W/m^2/delta_degC"
     _a_unit = "W/m^2/delta_degC^2"
     _efficacy_unit = "dimensionless"
     _eta_unit = "W/m^2/delta_degC"
@@ -42,7 +42,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
     _save_paras = (  # parameters to save when doing a run
         "du",
         "dl",
-        "lambda_0",
+        "lambda0",
         "a",
         "efficacy",
         "eta",
@@ -54,7 +54,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         self,
         du=50 * ur("m"),
         dl=1200 * ur("m"),
-        lambda_0=3.74 / 3 * ur("W/m^2/delta_degC"),
+        lambda0=3.74 / 3 * ur("W/m^2/delta_degC"),
         a=0.0 * ur("W/m^2/delta_degC^2"),
         efficacy=1.0 * ur("dimensionless"),
         eta=0.8 * ur("W/m^2/delta_degC"),
@@ -65,7 +65,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         """
         self.du = du
         self.dl = dl
-        self.lambda_0 = lambda_0
+        self.lambda0 = lambda0
         self.a = a
         self.efficacy = efficacy
         self.eta = eta
@@ -127,18 +127,18 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         return self.dl * density_water * heat_capacity_water
 
     @property
-    def lambda_0(self):
+    def lambda0(self):
         """
         :obj:`pint.Quantity`
             Initial climate feedback factor
         """
-        return self._lambda_0
+        return self._lambda0
 
-    @lambda_0.setter
-    def lambda_0(self, val):
-        self._assert_is_pint_quantity_with_units(val, "lambda_0", self._lambda_0_unit)
-        self._lambda_0 = val
-        self._lambda_0_mag = val.to(self._lambda_0_unit).magnitude
+    @lambda0.setter
+    def lambda0(self, val):
+        self._assert_is_pint_quantity_with_units(val, "lambda0", self._lambda0_unit)
+        self._lambda0 = val
+        self._lambda0_mag = val.to(self._lambda0_unit).magnitude
 
     @property
     def a(self):
@@ -216,7 +216,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
                 self._temp_upper_mag[self._timestep_idx - 1],
                 self._temp_lower_mag[self._timestep_idx - 1],
                 self._erf_mag[self._timestep_idx - 1],
-                self._lambda_0_mag,
+                self._lambda0_mag,
                 self._a_mag,
                 self._efficacy_mag,
                 self._eta_mag,
@@ -243,9 +243,9 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
 
     @staticmethod
     def _calculate_next_temp_upper(  # pylint: disable=too-many-arguments
-        delta_t, t_upper, t_lower, erf, lambda_0, a, efficacy, eta, heat_capacity_upper
+        delta_t, t_upper, t_lower, erf, lambda0, a, efficacy, eta, heat_capacity_upper
     ):
-        lambda_now = lambda_0 - a * t_upper
+        lambda_now = lambda0 - a * t_upper
         heat_exchange = efficacy * eta * (t_upper - t_lower)
         dT_dt = (erf - lambda_now * t_upper - heat_exchange) / heat_capacity_upper
 
@@ -333,7 +333,7 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
             )
 
         gh = _calculate_geoffroy_helper_parameters(
-            self.du, self.dl, self.lambda_0, self.efficacy, self.eta
+            self.du, self.dl, self.lambda0, self.efficacy, self.eta
         )
 
         d1 = gh["tau1"]

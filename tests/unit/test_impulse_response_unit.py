@@ -73,7 +73,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         )
 
     def test_calculate_next_rndt(self, check_same_unit):
-        ttemp_1 = 1.1
+        ttemp1 = 1.1
         ttemp_2 = 0.6
         tq1 = 0.5
         tq2 = 0.3
@@ -94,13 +94,13 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         C = helper_twolayer.heat_capacity_upper
         C_D = helper_twolayer.heat_capacity_lower
 
-        b_pt_1 = (
-            helper_twolayer.lambda_0 + helper_twolayer.efficacy * helper_twolayer.eta
+        b_pt1 = (
+            helper_twolayer.lambda0 + helper_twolayer.efficacy * helper_twolayer.eta
         ) / (C)
-        b_pt_2 = (helper_twolayer.eta) / (C_D)
-        b = b_pt_1 + b_pt_2
-        b_star = b_pt_1 - b_pt_2
-        delta = b ** 2 - (4 * helper_twolayer.lambda_0 * helper_twolayer.eta) / (
+        b_pt2 = (helper_twolayer.eta) / (C_D)
+        b = b_pt1 + b_pt2
+        b_star = b_pt1 - b_pt2
+        delta = b ** 2 - (4 * helper_twolayer.lambda0 * helper_twolayer.eta) / (
             C * C_D
         )
 
@@ -111,7 +111,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         gh = _calculate_geoffroy_helper_parameters(
             helper_twolayer.du,
             helper_twolayer.dl,
-            helper_twolayer.lambda_0,
+            helper_twolayer.lambda0,
             helper_twolayer.efficacy,
             helper_twolayer.eta,
         )
@@ -120,20 +120,20 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             helper_twolayer.eta
             * (helper_twolayer.efficacy - 1)
             * (
-                ((1 - phi1) * ttemp_1 * ur("delta_degC"))
+                ((1 - phi1) * ttemp1 * ur("delta_degC"))
                 + ((1 - phi2) * ttemp_2 * ur("delta_degC"))
             )
         )
 
         expected = (
             terf * ur(helper._erf_unit)
-            - ((ttemp_1 + ttemp_2) * ur(helper._temp1_unit)) * helper_twolayer.lambda_0
+            - ((ttemp1 + ttemp_2) * ur(helper._temp1_unit)) * helper_twolayer.lambda0
             - efficacy_term
         )
         assert str(expected.units) == "watt / meter ** 2"
 
         res = helper._calculate_next_rndt(
-            ttemp_1, ttemp_2, terf, tq1, tq2, td1, td2, tefficacy
+            ttemp1, ttemp_2, terf, tq1, tq2, td1, td2, tefficacy
         )
 
         npt.assert_allclose(res, expected.magnitude)
@@ -141,7 +141,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         # check internal units make sense
         check_same_unit(self.tmodel._q1_unit, self.tmodel._q2_unit)
         check_same_unit(
-            helper_twolayer._lambda_0_unit, (1.0 * ur(self.tmodel._q2_unit) ** -1)
+            helper_twolayer._lambda0_unit, (1.0 * ur(self.tmodel._q2_unit) ** -1)
         )
         check_same_unit(
             self.tmodel._erf_unit,
@@ -271,19 +271,19 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         # for explanation of what is going on, see
         # impulse-response-equivalence.ipynb
         efficacy = tefficacy
-        lambda_0 = 1 / (tq1 + tq2)
+        lambda0 = 1 / (tq1 + tq2)
         C = (td1 * td2) / (tq1 * td2 + tq2 * td1)
 
-        a1 = lambda_0 * tq1
-        a2 = lambda_0 * tq2
+        a1 = lambda0 * tq1
+        a2 = lambda0 * tq2
         tau1 = td1
         tau2 = td2
 
-        C_D = (lambda_0 * (tau1 * a1 + tau2 * a2) - C) / efficacy
+        C_D = (lambda0 * (tau1 * a1 + tau2 * a2) - C) / efficacy
         eta = C_D / (tau1 * a2 + tau2 * a1)
 
         expected = {
-            "lambda_0": lambda_0,
+            "lambda0": lambda0,
             "du": C / (density_water * heat_capacity_water),
             "dl": C_D / (density_water * heat_capacity_water),
             "eta": eta,

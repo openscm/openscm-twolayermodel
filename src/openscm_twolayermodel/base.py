@@ -266,17 +266,17 @@ class TwoLayerVariant(Model):
         pass
 
 
-def _calculate_geoffroy_helper_parameters(du, dl, lambda_0, efficacy, eta):
+def _calculate_geoffroy_helper_parameters(du, dl, lambda0, efficacy, eta):
     C = du * heat_capacity_water * density_water
     C_D = dl * heat_capacity_water * density_water
 
-    b_pt_1 = (lambda_0 + efficacy * eta) / (C)
-    b_pt_2 = (eta) / (C_D)
-    b = b_pt_1 + b_pt_2
-    b_star = b_pt_1 - b_pt_2
-    delta = b ** 2 - (4 * lambda_0 * eta) / (C * C_D)
+    b_pt1 = (lambda0 + efficacy * eta) / (C)
+    b_pt2 = (eta) / (C_D)
+    b = b_pt1 + b_pt2
+    b_star = b_pt1 - b_pt2
+    delta = b ** 2 - (4 * lambda0 * eta) / (C * C_D)
 
-    taucoeff = C * C_D / (2 * lambda_0 * eta)
+    taucoeff = C * C_D / (2 * lambda0 * eta)
     tau1 = taucoeff * (b - delta ** 0.5)
     tau2 = taucoeff * (b + delta ** 0.5)
 
@@ -288,8 +288,8 @@ def _calculate_geoffroy_helper_parameters(du, dl, lambda_0, efficacy, eta):
     phi2 = phicoeff * (b_star + delta ** 0.5)
 
     adenom = C * (phi2 - phi1)
-    a1 = tau1 * phi2 * lambda_0 / adenom
-    a2 = -tau2 * phi1 * lambda_0 / adenom
+    a1 = tau1 * phi2 * lambda0 / adenom
+    a2 = -tau2 * phi1 * lambda0 / adenom
 
     out = {
         "C": C,
