@@ -309,3 +309,30 @@ class TwoLayerModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attri
         )
 
         return out_run_tss
+
+    def get_impulse_response_parameters(self):
+        """
+        Get equivalent two-layer impulse response model parameters
+
+        For details on how the equivalence is calculated, please see the notebook
+        ``impulse-response-equivalence.ipynb`` in the `OpenSCM Two Layer model
+        repository <github.com/openscm/openscm-twolayermodel>`_.
+
+        Returns
+        -------
+        dict of str : :obj:`pint.Quantity`
+            Input arguments to initialise an
+            :obj:`openscm_twolayermodel.ImpulseResponseModel` with the same
+            temperature response as ``self``
+
+        Raises
+        ------
+        ValueError
+            ``self.a`` is non-zero, the two-timescale model does not support
+            state-dependence.
+        """
+        if not np.equal(self.a.magnitude, 0):
+            raise ValueError(
+                "Cannot calculate impulse response parameters with "
+                "non-zero a={}".format(self.a)
+            )

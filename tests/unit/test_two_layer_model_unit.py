@@ -107,7 +107,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
             + tdelta_t
             * (
                 terf
-                + (tlambda_0 + ta * ttemp_upper) * ttemp_upper
+                - (tlambda_0 - ta * ttemp_upper) * ttemp_upper
                 - (tefficacy * teta * (ttemp_upper - ttemp_lower))
             )
             / theat_capacity_upper
