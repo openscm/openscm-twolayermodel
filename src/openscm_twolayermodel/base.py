@@ -12,6 +12,7 @@ from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
 from scmdata.timeseries import TimeSeries
 
+from .constants import density_water, heat_capacity_water
 from .errors import UnitError
 
 
@@ -263,3 +264,45 @@ class TwoLayerVariant(Model):
     @abstractmethod
     def _get_run_output_tss(self, ts_base):
         pass
+
+
+def _calculate_geoffroy_helper_parameters(du, dl, lambda_0, efficacy, eta):
+    C = du * heat_capacity_water * density_water
+    C_D = dl * heat_capacity_water * density_water
+
+    b_pt_1 = (lambda_0 + efficacy * eta) / (C)
+    b_pt_2 = (eta) / (C_D)
+    b = b_pt_1 + b_pt_2
+    b_star = b_pt_1 - b_pt_2
+    delta = b ** 2 - (4 * lambda_0 * eta) / (C * C_D)
+
+    taucoeff = C * C_D / (2 * lambda_0 * eta)
+    tau1 = taucoeff * (b - delta ** 0.5)
+    tau2 = taucoeff * (b + delta ** 0.5)
+
+    d1 = tau1
+    d2 = tau2
+
+    phicoeff = C / (2 * efficacy * eta)
+    phi1 = phicoeff * (b_star - delta ** 0.5)
+    phi2 = phicoeff * (b_star + delta ** 0.5)
+
+    adenom = C * (phi2 - phi1)
+    a1 = tau1 * phi2 * lambda_0 / adenom
+    a2 = -tau2 * phi1 * lambda_0 / adenom
+
+    out = {
+        "C": C,
+        "C_D": C_D,
+        "b": b,
+        "b_star": b_star,
+        "delta": delta,
+        "tau1": tau1,
+        "tau2": tau2,
+        "phi1": phi1,
+        "phi2": phi2,
+        "a1": a1,
+        "a2": a2,
+    }
+
+    return out

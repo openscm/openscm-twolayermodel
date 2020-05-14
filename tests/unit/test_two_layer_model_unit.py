@@ -7,6 +7,7 @@ from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import TwoLayerModel
+from openscm_twolayermodel.base import _calculate_geoffroy_helper_parameters
 from openscm_twolayermodel.constants import density_water, heat_capacity_water
 
 
@@ -409,3 +410,58 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         )
         with pytest.raises(ValueError, match=error_msg):
             self.tmodel(a=ta).get_impulse_response_parameters()
+
+
+def test_calculate_geoffroy_helper_parameters(check_equal_pint):
+    tdu = 35 * ur("m")
+    tdl = 3200 * ur("m")
+    tlambda_0 = 4 / 3 * ur("W/m^2/delta_degC")
+    tefficacy = 1.1 * ur("dimensionless")
+    teta=0.7 * ur("W/m^2/delta_degC")
+
+    # for explanation of what is going on, see
+    # impulse-response-equivalence.ipynb
+    C = (density_water * heat_capacity_water * tdu)
+    C_D = (density_water * heat_capacity_water * tdl)
+
+    b = (tlambda_0 + tefficacy * teta) / C + teta / C_D
+    b_star = (tlambda_0 + tefficacy * teta) / C - teta / C_D
+    delta = b**2 - 4 * tlambda_0 * teta / (C * C_D)
+
+    tau1 = C * C_D / (2 * tlambda_0 * teta) * (b - delta**0.5)
+    tau2 = C * C_D / (2 * tlambda_0 * teta) * (b + delta**0.5)
+    phi1 = C / (2 * tefficacy * teta) * (b_star - delta**0.5)
+    phi2 = C / (2 * tefficacy * teta) * (b_star + delta**0.5)
+
+    a1 = phi2 * tau1 * tlambda_0 / (C * (phi2 - phi1))
+    a2 = - phi1 * tau2 * tlambda_0 / (C * (phi2 - phi1))
+
+    expected = {
+        "C": C,
+        "C_D": C_D,
+        "b": b,
+        "b_star": b_star,
+        "delta": delta,
+        "tau1": tau1,
+        "tau2": tau2,
+        "phi1": phi1,
+        "phi2": phi2,
+        "a1": a1,
+        "a2": a2,
+    }
+
+    # check relationships hold
+    check_equal_pint(a1 + a2, 1 * ur("dimensionless"))
+    check_equal_pint(a1 / tau1 + a2 / tau2, tlambda_0 / C)
+    check_equal_pint(a1 * tau1 + a2 * tau2, (C + tefficacy * C_D) / tlambda_0)
+    check_equal_pint(a1 * tau2 + a2 * tau1, C_D / teta)
+    check_equal_pint(phi1 * a1 / tau1 + phi2 * a2 / tau2, 0 * ur("1/s"), atol=1e-10)
+    check_equal_pint(tau1 * tau2, (C * C_D) / (tlambda_0 * teta))
+    check_equal_pint(C + phi1 * tefficacy * C_D, tlambda_0 * tau1)
+    check_equal_pint(C + phi2 * tefficacy * C_D, tlambda_0 * tau2)
+    check_equal_pint(phi1 * a1 + phi2 * a2, 1 * ur("dimensionless"))
+    check_equal_pint(phi1 * phi2 , - C / (tefficacy * C_D))
+
+    res = _calculate_geoffroy_helper_parameters(du=tdu, dl=tdl, lambda_0=tlambda_0, efficacy=tefficacy, eta=teta)
+
+    assert res == expected
