@@ -1,5 +1,5 @@
 """
-Physical constatns used in calculations
+Physical constants used in calculations
 """
 from openscm_units import unit_registry as ur
 
