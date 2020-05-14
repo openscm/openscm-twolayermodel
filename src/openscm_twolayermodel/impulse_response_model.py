@@ -281,7 +281,9 @@ class ImpulseResponseModel(
 
         return out_run_tss
 
-    def get_two_layer_parameters(self):  # pylint:disable=missing-return-doc,missing-return-type-doc
+    def get_two_layer_parameters(
+        self,
+    ):  # pylint:disable=missing-return-doc,missing-return-type-doc
         """
         Get equivalent two-layer model parameters
 
