@@ -14,7 +14,9 @@ from .errors import ModelStateError
 # pylint: disable=invalid-name
 
 
-class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instance-attributes
+class ImpulseResponseModel(
+    TwoLayerVariant
+):  # pylint: disable=too-many-instance-attributes
     """
     TODO: top line and paper references
 
@@ -73,7 +75,7 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
         self.efficacy = efficacy
         self.delta_t = delta_t
 
-        if (d1 >= d2):
+        if d1 >= d2:
             raise ValueError("The short-timescale must be d1")
 
         self._erf = np.zeros(1) * np.nan
@@ -230,20 +232,22 @@ class ImpulseResponseModel(TwoLayerVariant):  # pylint: disable=too-many-instanc
             b_pt_2 = eta / C_D
             b = b_pt_1 + b_pt_2
             b_star = b_pt_1 - b_pt_2
-            delta = b**2 - (4 * lambda_0 * eta) / (C * C_D)
+            delta = b ** 2 - (4 * lambda_0 * eta) / (C * C_D)
 
             phicoeff = C / (2 * efficacy * eta)
-            phi1 = phicoeff * (b_star - delta**0.5)
-            phi2 = phicoeff * (b_star + delta**0.5)
+            phi1 = phicoeff * (b_star - delta ** 0.5)
+            phi2 = phicoeff * (b_star + delta ** 0.5)
 
             t1_h = t1 * ur(self._temp1_unit)
             t2_h = t2 * ur(self._temp2_unit)
-            efficacy_term = eta * (efficacy - 1) * ((1 - phi1) * t1_h - (1 - phi2) * t2_h)
+            efficacy_term = (
+                eta * (efficacy - 1) * ((1 - phi1) * t1_h - (1 - phi2) * t2_h)
+            )
 
             if str(efficacy_term.units) != "watt / meter ** 2":
                 raise AssertionError("units should have come out as W/m^2")
 
-        out = (erf - lambda_0.magnitude * (t1 + t2) - efficacy_term.magnitude)
+        out = erf - lambda_0.magnitude * (t1 + t2) - efficacy_term.magnitude
 
         return out
 
