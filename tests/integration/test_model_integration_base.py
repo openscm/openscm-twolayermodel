@@ -54,6 +54,8 @@ class TwoLayerVariantIntegrationTester(ModelIntegrationTester):
         inp_other_unit.set_meta("kW/m^2", "unit")
         res_other_unit = model.run_scenarios(inp_other_unit)
 
+        assert res.get_unique_meta("climate_model", no_duplicates=True) == model._name
+
         check_scmruns_allclose(
             res.filter(variable="Effective Radiative Forcing", keep=False),
             res_other_unit.filter(variable="Effective Radiative Forcing", keep=False),
