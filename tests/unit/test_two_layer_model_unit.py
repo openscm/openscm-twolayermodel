@@ -352,11 +352,11 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         assert_is_nan_and_erf_shape(model._temp_lower_mag)
         assert_is_nan_and_erf_shape(model._rndt_mag)
 
-    def test_get_impulse_response_parameters(self):
+    def test_get_impulse_response_parameters(self, check_equal_pint):
         tdu = 35 * ur("m")
         tdl = 3200 * ur("m")
-        tlambda_0=4 / 3 * ur("W/m^2/delta_degC")
-        tefficacy=1.1 * ur("dimensionless")
+        tlambda_0 = 4 / 3 * ur("W/m^2/delta_degC")
+        tefficacy = 1.1 * ur("dimensionless")
         teta=0.7 * ur("W/m^2/delta_degC")
 
         mod_instance = self.tmodel(
@@ -373,8 +373,8 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         C = mod_instance.heat_capacity_upper
         C_D = mod_instance.heat_capacity_lower
 
-        b =(tlambda_0 + tefficacy * teta) / C + teta / C_D
-        b_star =(tlambda_0 + tefficacy * teta) / C - teta / C_D
+        b = (tlambda_0 + tefficacy * teta) / C + teta / C_D
+        b_star = (tlambda_0 + tefficacy * teta) / C - teta / C_D
         delta = b**2 - 4 * tlambda_0 * teta / (C * C_D)
 
         tau1 = C * C_D / (2 * tlambda_0 * teta) * (b - delta**0.5)
@@ -389,6 +389,11 @@ class TestTwoLayerModel(TwoLayerVariantTester):
             "d2": tau2,
             "efficacy": tefficacy,
         }
+
+        a1 = tlambda_0 * expected["q1"]
+        a2 = tlambda_0 * expected["q2"]
+
+        check_equal_pint(a1 + a2, 1 * ur("dimensionless"))
 
         res = mod_instance.get_impulse_response_parameters()
 
