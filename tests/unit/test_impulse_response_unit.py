@@ -3,7 +3,7 @@ import numpy.testing as npt
 from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
-from openscm_twolayermodel import ImpulseResponseModel
+from openscm_twolayermodel import ImpulseResponseModel, TwoLayerModel
 
 
 class TestImpulseResponseModel(TwoLayerVariantTester):
@@ -14,7 +14,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         q2=0.41 * ur("delta_degC/(W/m^2)"),
         d1=239.0 * ur("yr"),
         d2=4.1 * ur("yr"),
-        # efficacy=1.0 * ur("efficacy"), # TODO: turn on because efficacy determines implied ocean heat uptake of impulse response model
+        efficacy=1.0 * ur("dimensionless"),
         delta_t=1 * ur("yr"),
     )
 
@@ -24,6 +24,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             q2=0.4 * ur("delta_degC/(W/m^2)"),
             d1=250.0 * ur("yr"),
             d2=3 * ur("yr"),
+            efficacy=1.1 * ur("dimensionless"),
             delta_t=1 / 12 * ur("yr"),
         )
 
@@ -62,20 +63,58 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         )
 
     def test_calculate_next_rndt(self, check_same_unit):
-        ttemp = 1.1
+        ttemp_1 = 1.1
+        ttemp_2 = 0.6
         tq1 = 0.5
         tq2 = 0.3
+        td1 = 30
+        td2 = 600
         terf = 1.2
+        tefficacy = 1.13
 
-        res = self.tmodel._calculate_next_rndt(ttemp, terf, tq1, tq2,)
+        res = self.tmodel._calculate_next_rndt(ttemp_1, ttemp_2, terf, tq1, tq2, td1, td2, tefficacy)
 
+        helper = self.tmodel(
+            q1=tq1 * ur("delta_degC/(W/m^2)"),
+            q2=tq2 * ur("delta_degC/(W/m^2)"),
+            d1=td1 * ur("yr"),
+            d2=td2 * ur("yr"),
+            efficacy=tefficacy * ur("dimensionless"),
+        )
+        helper_twolayer = TwoLayerModel(**self.tmodel.get_two_layer_parameters())
+
+        C = helper_twolayer.heat_capacity_upper
+        C_D = helper_twolayer.heat_capacity_lower
+
+        b_pt_1 = (helper_twolayer.lambda_0 + helper_twolayer.efficacy * helper_twolayer.eta) / (C)
+        b_pt_2 = (helper_twolayer.eta) / (C_D)
+        b = b_pt_1 + b_pt_2
+        b_star = b_pt_1 - b_pt_2
+        delta = b**2 - (4 * helper_twolayer.lambda_0 * helper_twolayer.eta) / (C * C_D)
+
+        phicoeff = C / (2 * helper_twolayer.epsilon * helper_twolayer.eta)
+        phi1 = phicoeff * (b_star - delta**0.5)
+        phi2 = phicoeff * (b_star + delta**0.5)
         # see notebook for discussion of why this is so
-        expected = terf - ttemp / (tq1 + tq2)
+        efficacy_term = (
+            helper_twolayer.eta
+            * (helper_twolayer.efficacy - 1)
+            * (
+                (1 - phi1) * ttemp_1 * ur("delta_degC")
+                - (1 - phi2) * ttemp_2 * ur("delta_degC")
+            )
+        )
+        expected = (
+            terf
+            - (ttemp_1 + ttemp_2) * helper_twolayer.lambda_0
+            - efficacy_term
+        ).magnitude
 
         npt.assert_allclose(res, expected)
 
         # check internal units make sense
         check_same_unit(self.tmodel._q1_unit, self.tmodel._q2_unit)
+        check_same_unit(helper_twolayer._lambda_0_unit, self.tmodel._q2_unit)
         check_same_unit(
             self.tmodel._erf_unit,
             (
@@ -83,6 +122,10 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
                     1.0 * ur(self.tmodel._temp1_unit) / (1.0 * ur(self.tmodel._q1_unit))
                 ).units
             ),
+        )
+        check_same_unit(
+            self.tmodel._erf_unit,
+            efficacy_term.units,
         )
 
     def test_step(self):
@@ -183,3 +226,52 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         assert_is_nan_and_erf_shape(model._temp1_mag)
         assert_is_nan_and_erf_shape(model._temp2_mag)
         assert_is_nan_and_erf_shape(model._rndt_mag)
+
+    def test_get_two_layer_model_parameters(self, check_equal_pint):
+        tq1=0.3 * ur("delta_degC/(W/m^2)"),
+        tq2=0.4 * ur("delta_degC/(W/m^2)"),
+        td1=300.0 * ur("yr"),
+        td2=3 * ur("yr"),
+        tefficacy=1.2 * ur("dimensionless"),
+
+        start_paras = dict(
+            d1=td1,
+            d2=td2,
+            q1=tq1,
+            q2=tq2,
+            efficacy=tefficacy,
+        )
+
+        mod_instance = self.tmodel(**start_paras)
+
+        # for explanation of what is going on, see
+        # impulse-response-equivalence.ipynb
+        efficacy = tefficacy
+        lambda_0 = 1 / (tq1 + tq2)
+        C = (td1 * td2) / (tq1 * td2 + tq2 * td1)
+
+        a1 = lambda_0 * tq1
+        a2 = lambda_0 * tq2
+        tau1 = td1
+        tau2 = td2
+
+        C_D = (lambda_0 * (tau1 * a1 + tau2 * a2) - C) / efficacy
+        eta = C_D / (tau1 * a2 + tau2 * a1)
+
+        expected = {
+            "lambda_0": lambda_0,
+            "du": C / (TwoLayerModel.density_water * TwoLayerModel.heat_capacity_water),
+            "dl": C_D / (TwoLayerModel.density_water * TwoLayerModel.heat_capacity_water),
+            "eta": eta,
+            "efficacy": efficacy,
+        }
+
+        a1 = tlambda_0 * expected["q1"]
+        a2 = tlambda_0 * expected["q2"]
+
+        res = mod_instance.get_two_layer_parameters()
+
+        assert res == expected
+
+        # check circularity
+        assert TwoLayerModel(**res).get_impulse_response_parameters() == start_paras
