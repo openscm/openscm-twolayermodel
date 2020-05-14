@@ -1,6 +1,10 @@
 .DEFAULT_GOAL := help
 
 VENV_DIR ?= venv
+TESTS_DIR=$(PWD)/tests
+
+NOTEBOOKS_DIR=./notebooks
+NOTEBOOKS_SANITIZE_FILE=$(TESTS_DIR)/notebook-tests.cfg
 
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -34,6 +38,16 @@ format:  ## re-format files
 	make isort
 	make black
 
+.PHONY: format-notebooks
+format-notebooks: $(VENV_DIR)  ## format the notebooks
+	@status=$$(git status --porcelain $(NOTEBOOKS_DIR)); \
+	if test "x$${status}" = x; then \
+		$(VENV_DIR)/bin/black-nb $(NOTEBOOKS_DIR); \
+	else \
+		echo Not trying any formatting. Working directory is dirty ... >&2; \
+	fi;
+
+.PHONY: black
 black: $(VENV_DIR)  ## apply black formatter to source and tests
 	@status=$$(git status --porcelain src tests docs scripts); \
 	if test "x$${status}" = x; then \
@@ -42,6 +56,7 @@ black: $(VENV_DIR)  ## apply black formatter to source and tests
 		echo Not trying any formatting. Working directory is dirty ... >&2; \
 	fi;
 
+.PHONY: isort
 isort: $(VENV_DIR)  ## format the code
 	@status=$$(git status --porcelain src tests); \
 	if test "x$${status}" = x; then \

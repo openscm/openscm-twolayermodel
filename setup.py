@@ -33,6 +33,7 @@ REQUIREMENTS_DEV = [
     *[
         "bandit",
         "black",
+        "black-nb",
         "flake8",
         "isort",
         "mypy",
