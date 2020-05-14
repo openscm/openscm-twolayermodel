@@ -18,13 +18,20 @@ README = "README.rst"
 
 SOURCE_DIR = "src"
 
-REQUIREMENTS = ["openscm-units", "tqdm", "scmdata>=0.4.3"]
+REQUIREMENTS = ["openscm-units", "scmdata>=0.4.3", "tqdm"]
 REQUIREMENTS_NOTEBOOKS = [
     "ipywidgets",
     "notebook",
     "seaborn",
 ]
-REQUIREMENTS_TESTS = ["codecov", "coverage", "nbval", "pytest-cov", "pytest>=4.0"]
+REQUIREMENTS_TESTS = [
+    "codecov",
+    "coverage",
+    "nbval",
+    "pytest-cov",
+    "pytest>=4.0",
+    "scipy",
+]
 REQUIREMENTS_DOCS = ["sphinx>=1.4", "sphinx_rtd_theme", "sphinx-click"]
 REQUIREMENTS_DEPLOY = ["twine>=1.11.0", "setuptools>=38.6.0", "wheel>=0.31.0"]
 
