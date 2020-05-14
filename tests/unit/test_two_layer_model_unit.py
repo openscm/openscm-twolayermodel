@@ -7,7 +7,7 @@ from openscm_units import unit_registry as ur
 from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import TwoLayerModel
-
+from openscm_twolayermodel.constants import density_water, heat_capacity_water
 
 class TestTwoLayerModel(TwoLayerVariantTester):
     tmodel = TwoLayerModel
@@ -46,7 +46,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     def test_heat_capacity_upper(self, check_equal_pint):
         model = self.tmodel(du=50000 * ur("mm"))
 
-        expected = model.du * model.density_water * model.heat_capacity_water
+        expected = model.du * density_water * heat_capacity_water
 
         res = model.heat_capacity_upper
 
@@ -64,7 +64,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     def test_heat_capacity_lower(self, check_equal_pint):
         model = self.tmodel(dl=2.5 * ur("km"))
 
-        expected = model.dl * model.density_water * model.heat_capacity_water
+        expected = model.dl * density_water * heat_capacity_water
 
         res = model.heat_capacity_lower
 
