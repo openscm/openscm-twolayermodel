@@ -12,8 +12,10 @@ from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
 from scmdata.timeseries import TimeSeries
 
-from .constants import density_water, heat_capacity_water
+from .constants import DENSITY_WATER, HEAT_CAPACITY_WATER
 from .errors import UnitError
+
+# pylint: disable=invalid-name
 
 
 class Model(ABC):
@@ -171,7 +173,9 @@ class TwoLayerVariant(Model):
             "Could not decide on timestep for time axis: {}".format(driver["time"])
         )
 
-    def run_scenarios(self, scenarios, driver_var="Effective Radiative Forcing"):
+    def run_scenarios(  # pylint:disable=too-many-locals
+        self, scenarios, driver_var="Effective Radiative Forcing"
+    ):
         """
         Run scenarios.
 
@@ -224,8 +228,9 @@ class TwoLayerVariant(Model):
 
         driver_ts = driver.timeseries()
         for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows())):
-            # TODO: ask Jared if there's a way to do this without going via
-            #       timeseries but that still drops nans
+            # TODO: ask Jared if there's  # pylint: disable=fixme
+            # a way to do this without going via timeseries but that still
+            # drops nans
             meta = dict(zip(driver_ts.index.names, label))
 
             row_no_nan = row.dropna()
@@ -238,9 +243,10 @@ class TwoLayerVariant(Model):
             out_run_tss = [ts]
             out_run_tss += self._get_run_output_tss(ts)
 
-            # TODO: ask Jared how we can handle this better
+            # TODO: ask Jared how we can  # pylint: disable=fixme
+            # handle this better
             out_run = ScmRun(row_no_nan, columns=meta)
-            out_run._ts = out_run_tss
+            out_run._ts = out_run_tss  # pylint: disable=protected-access
             out_run = ScmRun(out_run.timeseries())
             out_run.set_meta(i, "run_idx")
 
@@ -264,12 +270,13 @@ class TwoLayerVariant(Model):
     @abstractmethod
     def _get_run_output_tss(self, ts_base):
         """Get the run output timeseries as a list"""
-        pass
 
 
-def _calculate_geoffroy_helper_parameters(du, dl, lambda0, efficacy, eta):
-    C = du * heat_capacity_water * density_water
-    C_D = dl * heat_capacity_water * density_water
+def _calculate_geoffroy_helper_parameters(  # pylint:disable=too-many-locals
+    du, dl, lambda0, efficacy, eta
+):
+    C = du * HEAT_CAPACITY_WATER * DENSITY_WATER
+    C_D = dl * HEAT_CAPACITY_WATER * DENSITY_WATER
 
     b_pt1 = (lambda0 + efficacy * eta) / (C)
     b_pt2 = (eta) / (C_D)

@@ -12,7 +12,9 @@ load-plugins=
 [MESSAGES CONTROL]
 disable=
     # handled by black
-    format
+    format,
+    # annoyingly strict
+    duplicate-code
 
 [SIMILARITIES]
 ignore-comments=no
