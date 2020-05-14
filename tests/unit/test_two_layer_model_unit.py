@@ -17,7 +17,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     parameters = dict(
         du=40 * ur("m"),
         dl=1300 * ur("m"),
-        lambda_0=3.4 / 3 * ur("W/m^2/delta_degC"),
+        lambda0=3.4 / 3 * ur("W/m^2/delta_degC"),
         a=0.01 * ur("W/m^2/delta_degC^2"),
         efficacy=1.1 * ur("dimensionless"),
         eta=0.7 * ur("W/m^2/delta_degC"),
@@ -28,7 +28,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         init_kwargs = dict(
             du=10 * ur("m"),
             dl=2200 * ur("m"),
-            lambda_0=4 / 3 * ur("W/m^2/delta_degC"),
+            lambda0=4 / 3 * ur("W/m^2/delta_degC"),
             a=0.1 * ur("W/m^2/delta_degC^2"),
             efficacy=1.1 * ur("dimensionless"),
             eta=0.7 * ur("W/m^2/delta_degC"),
@@ -86,7 +86,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         ttemp_upper = 0.1
         ttemp_lower = 0.2
         terf = 1.1
-        tlambda_0 = 3.7 / 3
+        tlambda0 = 3.7 / 3
         ta = 0.02
         tefficacy = 0.9
         teta = 0.78
@@ -97,7 +97,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
             ttemp_upper,
             ttemp_lower,
             terf,
-            tlambda_0,
+            tlambda0,
             ta,
             tefficacy,
             teta,
@@ -109,7 +109,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
             + tdelta_t
             * (
                 terf
-                - (tlambda_0 - ta * ttemp_upper) * ttemp_upper
+                - (tlambda0 - ta * ttemp_upper) * ttemp_upper
                 - (tefficacy * teta * (ttemp_upper - ttemp_lower))
             )
             / theat_capacity_upper
@@ -119,7 +119,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
         # check internal units make sense
         check_same_unit(
-            self.tmodel._lambda_0_unit,
+            self.tmodel._lambda0_unit,
             (
                 1.0 * ur(self.tmodel._a_unit) * 1.0 * ur(self.tmodel._temp_upper_unit)
             ).units,
@@ -129,7 +129,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
             self.tmodel._erf_unit,
             (
                 1.0
-                * ur(self.tmodel._lambda_0_unit)
+                * ur(self.tmodel._lambda0_unit)
                 * 1.0
                 * ur(self.tmodel._temp_upper_unit)
             ).units,
@@ -275,7 +275,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
                 model._temp_upper_mag[model._timestep_idx - 1],
                 model._temp_lower_mag[model._timestep_idx - 1],
                 model._erf_mag[model._timestep_idx - 1],
-                model._lambda_0_mag,
+                model._lambda0_mag,
                 model._a_mag,
                 model._efficacy_mag,
                 model._eta_mag,
@@ -357,14 +357,14 @@ class TestTwoLayerModel(TwoLayerVariantTester):
     def test_get_impulse_response_parameters(self, check_equal_pint):
         tdu = 35 * ur("m")
         tdl = 3200 * ur("m")
-        tlambda_0 = 4 / 3 * ur("W/m^2/delta_degC")
+        tlambda0 = 4 / 3 * ur("W/m^2/delta_degC")
         tefficacy = 1.1 * ur("dimensionless")
         teta = 0.7 * ur("W/m^2/delta_degC")
 
         mod_instance = self.tmodel(
             du=tdu,
             dl=tdl,
-            lambda_0=tlambda_0,
+            lambda0=tlambda0,
             a=0.0 * ur("W/m^2/delta_degC^2"),
             efficacy=tefficacy,
             eta=teta,
@@ -375,12 +375,12 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         C = mod_instance.heat_capacity_upper
         C_D = mod_instance.heat_capacity_lower
 
-        b = (tlambda_0 + tefficacy * teta) / C + teta / C_D
-        b_star = (tlambda_0 + tefficacy * teta) / C - teta / C_D
-        delta = b ** 2 - 4 * tlambda_0 * teta / (C * C_D)
+        b = (tlambda0 + tefficacy * teta) / C + teta / C_D
+        b_star = (tlambda0 + tefficacy * teta) / C - teta / C_D
+        delta = b ** 2 - 4 * tlambda0 * teta / (C * C_D)
 
-        tau1 = C * C_D / (2 * tlambda_0 * teta) * (b - delta ** 0.5)
-        tau2 = C * C_D / (2 * tlambda_0 * teta) * (b + delta ** 0.5)
+        tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta ** 0.5)
+        tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta ** 0.5)
         phi1 = C / (2 * tefficacy * teta) * (b_star - delta ** 0.5)
         phi2 = C / (2 * tefficacy * teta) * (b_star + delta ** 0.5)
 
@@ -392,8 +392,8 @@ class TestTwoLayerModel(TwoLayerVariantTester):
             "efficacy": tefficacy,
         }
 
-        a1 = tlambda_0 * expected["q1"]
-        a2 = tlambda_0 * expected["q2"]
+        a1 = tlambda0 * expected["q1"]
+        a2 = tlambda0 * expected["q2"]
 
         check_equal_pint(a1 + a2, 1 * ur("dimensionless"))
 
@@ -415,7 +415,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 def test_calculate_geoffroy_helper_parameters(check_equal_pint):
     tdu = 35 * ur("m")
     tdl = 3200 * ur("m")
-    tlambda_0 = 4 / 3 * ur("W/m^2/delta_degC")
+    tlambda0 = 4 / 3 * ur("W/m^2/delta_degC")
     tefficacy = 1.1 * ur("dimensionless")
     teta=0.7 * ur("W/m^2/delta_degC")
 
@@ -424,17 +424,17 @@ def test_calculate_geoffroy_helper_parameters(check_equal_pint):
     C = (density_water * heat_capacity_water * tdu)
     C_D = (density_water * heat_capacity_water * tdl)
 
-    b = (tlambda_0 + tefficacy * teta) / C + teta / C_D
-    b_star = (tlambda_0 + tefficacy * teta) / C - teta / C_D
-    delta = b**2 - 4 * tlambda_0 * teta / (C * C_D)
+    b = (tlambda0 + tefficacy * teta) / C + teta / C_D
+    b_star = (tlambda0 + tefficacy * teta) / C - teta / C_D
+    delta = b**2 - 4 * tlambda0 * teta / (C * C_D)
 
-    tau1 = C * C_D / (2 * tlambda_0 * teta) * (b - delta**0.5)
-    tau2 = C * C_D / (2 * tlambda_0 * teta) * (b + delta**0.5)
+    tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta**0.5)
+    tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta**0.5)
     phi1 = C / (2 * tefficacy * teta) * (b_star - delta**0.5)
     phi2 = C / (2 * tefficacy * teta) * (b_star + delta**0.5)
 
-    a1 = phi2 * tau1 * tlambda_0 / (C * (phi2 - phi1))
-    a2 = - phi1 * tau2 * tlambda_0 / (C * (phi2 - phi1))
+    a1 = phi2 * tau1 * tlambda0 / (C * (phi2 - phi1))
+    a2 = - phi1 * tau2 * tlambda0 / (C * (phi2 - phi1))
 
     expected = {
         "C": C,
@@ -452,16 +452,16 @@ def test_calculate_geoffroy_helper_parameters(check_equal_pint):
 
     # check relationships hold
     check_equal_pint(a1 + a2, 1 * ur("dimensionless"))
-    check_equal_pint(a1 / tau1 + a2 / tau2, tlambda_0 / C)
-    check_equal_pint(a1 * tau1 + a2 * tau2, (C + tefficacy * C_D) / tlambda_0)
+    check_equal_pint(a1 / tau1 + a2 / tau2, tlambda0 / C)
+    check_equal_pint(a1 * tau1 + a2 * tau2, (C + tefficacy * C_D) / tlambda0)
     check_equal_pint(a1 * tau2 + a2 * tau1, C_D / teta)
     check_equal_pint(phi1 * a1 / tau1 + phi2 * a2 / tau2, 0 * ur("1/s"), atol=1e-10)
-    check_equal_pint(tau1 * tau2, (C * C_D) / (tlambda_0 * teta))
-    check_equal_pint(C + phi1 * tefficacy * C_D, tlambda_0 * tau1)
-    check_equal_pint(C + phi2 * tefficacy * C_D, tlambda_0 * tau2)
+    check_equal_pint(tau1 * tau2, (C * C_D) / (tlambda0 * teta))
+    check_equal_pint(C + phi1 * tefficacy * C_D, tlambda0 * tau1)
+    check_equal_pint(C + phi2 * tefficacy * C_D, tlambda0 * tau2)
     check_equal_pint(phi1 * a1 + phi2 * a2, 1 * ur("dimensionless"))
     check_equal_pint(phi1 * phi2 , - C / (tefficacy * C_D))
 
-    res = _calculate_geoffroy_helper_parameters(du=tdu, dl=tdl, lambda_0=tlambda_0, efficacy=tefficacy, eta=teta)
+    res = _calculate_geoffroy_helper_parameters(du=tdu, dl=tdl, lambda0=tlambda0, efficacy=tefficacy, eta=teta)
 
     assert res == expected

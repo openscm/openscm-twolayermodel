@@ -12,7 +12,7 @@ from openscm_twolayermodel import ImpulseResponseModel, TwoLayerModel
     (
         {},
         {"efficacy": 1.2 * unit_registry("dimensionless")},
-        {"lambda_0": 3.74 / 5 * unit_registry("W/m^2/delta_degC")},
+        {"lambda0": 3.74 / 5 * unit_registry("W/m^2/delta_degC")},
     ),
 )
 def test_two_layer_impulse_response_equivalence(two_layer_config):

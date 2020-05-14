@@ -218,13 +218,13 @@ class ImpulseResponseModel(
 
     def _calculate_next_rndt(self, t1, t2, erf, q1, q2, d1, d2, efficacy):
         two_layer_paras = self.get_two_layer_parameters()
-        lambda_0 = two_layer_paras["lambda_0"]
+        lambda0 = two_layer_paras["lambda0"]
 
         if np.equal(efficacy, 1):
             efficacy_term = 0 * ur(self._erf_unit)
         else:
             gh = _calculate_geoffroy_helper_parameters(
-                two_layer_paras["du"], two_layer_paras["dl"], two_layer_paras["lambda_0"], two_layer_paras["efficacy"], two_layer_paras["eta"]
+                two_layer_paras["du"], two_layer_paras["dl"], two_layer_paras["lambda0"], two_layer_paras["efficacy"], two_layer_paras["eta"]
             )
 
             t1_h = t1 * ur(self._temp1_unit)
@@ -236,7 +236,7 @@ class ImpulseResponseModel(
             if str(efficacy_term.units) != "watt / meter ** 2":
                 raise AssertionError("units should have come out as W/m^2")
 
-        out = erf - lambda_0.magnitude * (t1 + t2) - efficacy_term.magnitude
+        out = erf - lambda0.magnitude * (t1 + t2) - efficacy_term.magnitude
 
         return out
 
@@ -293,20 +293,20 @@ class ImpulseResponseModel(
             :obj:`openscm_twolayermodel.TwoLayerModel` with the same
             temperature response as ``self``
         """
-        lambda_0 = 1 / (self.q1 + self.q2)
+        lambda0 = 1 / (self.q1 + self.q2)
         C = (self.d1 * self.d2) / (self.q1 * self.d2 + self.q2 * self.d1)
 
-        a1 = lambda_0 * self.q1
-        a2 = lambda_0 * self.q2
+        a1 = lambda0 * self.q1
+        a2 = lambda0 * self.q2
 
-        C_D = (lambda_0 * (self.d1 * a1 + self.d2 * a2) - C) / self.efficacy
+        C_D = (lambda0 * (self.d1 * a1 + self.d2 * a2) - C) / self.efficacy
         eta = C_D / (self.d1 * a2 + self.d2 * a1)
 
         du = C / (density_water * heat_capacity_water)
         dl = C_D / (density_water * heat_capacity_water)
 
         out = {
-            "lambda_0": lambda_0,
+            "lambda0": lambda0,
             "du": du,
             "dl": dl,
             "eta": eta,
