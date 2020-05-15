@@ -39,9 +39,9 @@ It provides an extensible interface for the two-layer model, which could then be
 The implementation also provides an easy way to convert between the two-layer model of @held_2010_two_layer and the mathematically equivalent two-timescale impulse response model, used most notably as the thermal core of the FaIR model [@smith_2018_fairv1_3].
 The conversion between the two is an implementation of the proof by @geoffroy_2013_two_layer1.
 
-
-- needed as much easier to plug bits and pieces into, easier to extend, useful conversion between two forms which is not currently available
-- upgrades FaIR implementation to be modulare and object-oriented
-
+OpenSCM Two Layer Model was designed to provide a clean, modularised, extensible interface for one of the most commonly used simple climate models.
+The FaIR model [@fair_repo] implements a mathematically equivalent model but does not yet provide the conversion to the two-layer model and is not modularised hence easily extensible.
+We hope that this implementation could interface with other simple climate models like FaIR to allow simpler exploration of the combined behaviour of interacting climate components with minimal coupling headaches.
+As implemented here, the `OpenSCM Two Layer Model' interface is intended to be used by researchers as well as educators or simply interested parties.
 
 # References
