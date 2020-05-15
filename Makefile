@@ -112,6 +112,15 @@ $(VENV_DIR): setup.py
 
 	touch $(VENV_DIR)
 
+paper.pdf: paper.md paper.bib latex.template
+	pandoc --filter pandoc-citeproc --bibliography paper.bib  paper.md \
+  		--template latex.template -o paper.pdf \
+  		--pdf-engine=xelatex
+
+clean:
+	rm paper.pdf
+
+
 first-venv: ## create a new virtual environment for the very first repo setup
 	python3 -m venv $(VENV_DIR)
 
