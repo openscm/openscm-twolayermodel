@@ -146,7 +146,7 @@ jobs:
     - name: Install package from test PyPI
       run: |
         pip install --upgrade pip
-        pip install pandas
+        pip install openscm-units 'scmdata>=0.4.3' tqdm
         pip install -i https://testpypi.python.org/pypi openscm-twolayermodel --no-dependencies --pre
     - name: Test installation
       run: |
