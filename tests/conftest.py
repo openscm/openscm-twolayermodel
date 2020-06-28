@@ -29,7 +29,7 @@ def test_rcmip_forcings(test_data_root_dir):
 
 @pytest.fixture
 def test_rcmip_forcings_scmrun(test_rcmip_forcings):
-    return ScmRun(test_rcmip_forcings)
+    return ScmRun(test_rcmip_forcings, lowercase_cols=True)
 
 
 @pytest.fixture
