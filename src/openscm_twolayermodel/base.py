@@ -227,7 +227,9 @@ class TwoLayerVariant(Model):
         run_store = list()
 
         driver_ts = driver.timeseries()
-        for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows()), desc="scenarios", leave=False):
+        for i, (label, row) in tqdman.tqdm(
+            enumerate(driver_ts.iterrows()), desc="scenarios", leave=False
+        ):
             # TODO: ask Jared if there's  # pylint: disable=fixme
             # a way to do this without going via timeseries but that still
             # drops nans
