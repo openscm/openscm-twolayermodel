@@ -51,7 +51,7 @@ class TwoLayerVariantIntegrationTester(ModelIntegrationTester):
         # inp.convert_unit("kW/m^2") blows up
         inp_other_unit = inp.copy()
         inp_other_unit *= 10 ** -3
-        inp_other_unit.set_meta("kW/m^2", "unit")
+        inp_other_unit["unit"] = "kW/m^2"
         res_other_unit = model.run_scenarios(inp_other_unit)
 
         assert res.get_unique_meta("climate_model", no_duplicates=True) == model._name
@@ -63,7 +63,7 @@ class TwoLayerVariantIntegrationTester(ModelIntegrationTester):
 
     def test_run_wrong_units(self):
         inp = self.tinp.copy()
-        inp.set_meta("W", "unit")
+        inp["unit"] = "W"
 
         model = self.tmodel()
 
@@ -72,7 +72,7 @@ class TwoLayerVariantIntegrationTester(ModelIntegrationTester):
 
     def test_run_wrong_region(self):
         inp = self.tinp.copy()
-        inp.set_meta("World|R5LAM", "region")
+        inp["region"] = "World|R5LAM"
 
         model = self.tmodel()
 

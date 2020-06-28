@@ -217,9 +217,9 @@ class TwoLayerVariant(Model):
                 "No World data available for driver_var `{}`".format(driver_var)
             )
 
-        driver.set_meta(self._name, "climate_model")
+        driver["climate_model"] = self._name
         for k, v in save_paras_meta.items():
-            driver.set_meta(v, k)
+            driver[k] = v
 
         timestep = self._select_timestep(driver)
         self.delta_t = timestep
@@ -227,7 +227,7 @@ class TwoLayerVariant(Model):
         run_store = list()
 
         driver_ts = driver.timeseries()
-        for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows())):
+        for i, (label, row) in tqdman.tqdm(enumerate(driver_ts.iterrows()), desc="scenarios", leave=False):
             # TODO: ask Jared if there's  # pylint: disable=fixme
             # a way to do this without going via timeseries but that still
             # drops nans
@@ -248,7 +248,7 @@ class TwoLayerVariant(Model):
             out_run = ScmRun(row_no_nan, columns=meta)
             out_run._ts = out_run_tss  # pylint: disable=protected-access
             out_run = ScmRun(out_run.timeseries())
-            out_run.set_meta(i, "run_idx")
+            out_run["run_idx"] = i
 
             run_store.append(out_run)
 
