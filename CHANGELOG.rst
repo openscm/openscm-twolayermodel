@@ -20,6 +20,7 @@ master
 Changed
 ~~~~~~~
 
+- (`#11 <https://github.com/openscm/openscm-twolayermodel/pull/11>`_) Re-wrote the getting started notebook
 - (`#10 <https://github.com/openscm/openscm-twolayermodel/pull/10>`_) Re-wrote CHANGELOG
 - (`#9 <https://github.com/openscm/openscm-twolayermodel/pull/9>`_) Update to scmdata 0.5.Y
 
