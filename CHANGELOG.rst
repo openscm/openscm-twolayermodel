@@ -17,6 +17,11 @@ The changes listed in this file are categorised as follows:
 master
 ------
 
+Added
+~~~~~
+
+- (`#8 <https://github.com/openscm/openscm-twolayermodel/pull/8>`_) Add notebook showing how to run a single-layer model
+
 Changed
 ~~~~~~~
 
