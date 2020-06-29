@@ -71,10 +71,19 @@ docs: $(VENV_DIR)  ## build the docs
 test:  $(VENV_DIR) ## run the full testsuite
 	$(VENV_DIR)/bin/pytest --cov -rfsxEX --cov-report term-missing
 
+test-install: $(VENV_DIR)  ## test whether installing in a fresh venv works
+	$(eval TEMPVENV := $(shell mktemp -d))
+	python3 -m venv $(TEMPVENV)
+	$(TEMPVENV)/bin/pip install pip --upgrade
+	$(TEMPVENV)/bin/pip install wheel 'setuptools>=41.2'
+	$(TEMPVENV)/bin/pip install .
+	$(TEMPVENV)/bin/python scripts/test_install.py
+
 test-testpypi-install: $(VENV_DIR)  ## test whether installing from test PyPI works
 	$(eval TEMPVENV := $(shell mktemp -d))
 	python3 -m venv $(TEMPVENV)
 	$(TEMPVENV)/bin/pip install pip --upgrade
+	$(TEMPVENV)/bin/pip install wheel 'setuptools>=41.2'
 	# Install dependencies not on testpypi registry
 	$(TEMPVENV)/bin/pip install pandas
 	# Install pymagicc without dependencies.
@@ -87,6 +96,7 @@ test-pypi-install: $(VENV_DIR)  ## test whether installing from PyPI works
 	$(eval TEMPVENV := $(shell mktemp -d))
 	python3 -m venv $(TEMPVENV)
 	$(TEMPVENV)/bin/pip install pip --upgrade
+	$(TEMPVENV)/bin/pip install wheel 'setuptools>=41.2'
 	$(TEMPVENV)/bin/pip install openscm-twolayermodel --pre
 	$(TEMPVENV)/bin/python scripts/test_install.py
 
