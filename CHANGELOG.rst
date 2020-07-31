@@ -17,6 +17,14 @@ The changes listed in this file are categorised as follows:
 master
 ------
 
+v0.1.2 - 2020-31-07
+-------------------
+
+Changed
+~~~~~~~
+
+- (`#12 <https://github.com/openscm/openscm-twolayermodel/pull/12>`_) Upgrade to ``scmdata>=0.6.2`` so that package can be installed
+
 v0.1.1 - 2020-06-29
 -------------------
 
