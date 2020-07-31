@@ -14,7 +14,9 @@ disable=
     # handled by black
     format,
     # annoyingly strict
-    duplicate-code
+    duplicate-code,
+    # fails with venv
+    import-error
 
 [SIMILARITIES]
 ignore-comments=no

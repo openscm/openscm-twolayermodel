@@ -41,7 +41,7 @@ REQUIREMENTS_DEV = [
         "black",
         "black-nb",
         "flake8",
-        "isort",
+        "isort<5",  # isort 5 incompatible with pylint
         "mypy",
         "nbdime",
         "pydocstyle",
