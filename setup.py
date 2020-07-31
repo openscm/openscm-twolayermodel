@@ -18,7 +18,7 @@ README = "README.rst"
 
 SOURCE_DIR = "src"
 
-REQUIREMENTS = ["openscm-units", "scmdata>=0.5.1", "tqdm"]
+REQUIREMENTS = ["openscm-units", "scmdata>=0.6.2", "tqdm"]
 REQUIREMENTS_NOTEBOOKS = [
     "ipywidgets",
     "notebook",
@@ -41,7 +41,7 @@ REQUIREMENTS_DEV = [
         "black",
         "black-nb",
         "flake8",
-        "isort",
+        "isort<5",  # isort 5 incompatible with pylint
         "mypy",
         "nbdime",
         "pydocstyle",
