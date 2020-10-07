@@ -4,13 +4,13 @@ tags:
   - Python
   - climate science
   - temperature projections
-  - simple models
+  - simple climate model
+  - energy balance
+  - reduced complexity climate model
 authors:
   - name: Zebedee R. J. Nicholls
     orcid: 0000-0003-0872-7098
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
-  - name: Robert Gieseke
-    affiliation: 3
+    affiliation: "1, 2"
   - name: Jared Lewis
     affiliation: 1
 affiliations:
@@ -18,9 +18,7 @@ affiliations:
    index: 1
  - name: School of Earth Sciences, The University of Melbourne, Parkville, Victoria, Australia
    index: 2
- - name: Institution 3
-   index: 3
-date: 15 May 2020
+date: 7 October 2020
 bibliography: paper.bib
 ---
 
@@ -32,6 +30,9 @@ The field of simple climate modelling is widely used, in particular for assessin
 
 One of the most commonly used models of the climate's response to changes in the `Earth's energy balance' (energy in compared to energy out of the earth system) is the two-layer model originally introduced by @held_2010_two_layer.
 While this model must be given energy imbalances (more precisely, radiative forcing) rather than emissions, it is nonetheless a widely used tool within climate science.
+Approximately speaking, the model represents the Earth System as an ocean with two-layers.
+The upper layer absorbs excess heat in the Earth System and then exchanges heat with the deep layer.
+As a result, in response to a perturbation, the model responds with a distinctive two-timescale response, commonly referred to as the `fast' and `slow' warming components.
 Since @held_2010_two_layer, the model has been extended to include updated representations of the efficiency of ocean heat uptake [@geoffroy_2013_two_layer2] as well as a state-dependent response to radiative forcing [@bloch_johnson_2015_feedback_dependence; @rohrschneider_2019_simple].
 
 `OpenSCM Two Layer Model' is an object-oriented, open-source implementation of the two-layer model.
@@ -39,9 +40,18 @@ It provides an extensible interface for the two-layer model, which could then be
 The implementation also provides an easy way to convert between the two-layer model of @held_2010_two_layer and the mathematically equivalent two-timescale impulse response model, used most notably as the thermal core of the FaIR model [@smith_2018_fairv1_3].
 The conversion between the two is an implementation of the proof by @geoffroy_2013_two_layer1.
 
+# Statement of need
+
 OpenSCM Two Layer Model was designed to provide a clean, modularised, extensible interface for one of the most commonly used simple climate models.
-The FaIR model [@fair_repo] implements a mathematically equivalent model but does not yet provide the conversion to the two-layer model and is not modularised hence easily extensible.
+It was used in Phase 1 of the Reduced Complexity Model Intercomparison Project [@rcmip_phase_1] as a point of comparison for the other participating models.
+
+The FaIR model [@fair_repo] implements a mathematically equivalent model but does not provide as clear a conversion between the two-layer model and the two-timescale response as is provided here.
 We hope that this implementation could interface with other simple climate models like FaIR to allow simpler exploration of the combined behaviour of interacting climate components with minimal coupling headaches.
-As implemented here, the `OpenSCM Two Layer Model' interface is intended to be used by researchers as well as educators or simply interested parties.
+
+As implemented here, the `OpenSCM Two Layer Model' interface is intended to be used in research or education.
+
+# Acknowledgements
+
+We thank Robert Gieseke for comments on the manuscript and for all of his efforts within the OpenSCM project.
 
 # References
