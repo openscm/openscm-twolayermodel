@@ -34,7 +34,7 @@ class Model(ABC):
         try:
             quantity.to(model_units)
         except pint.errors.DimensionalityError as exc:
-            raise UnitError("Wrong units for `{}`. {}".format(name, exc))
+            raise UnitError("Wrong units for `{}`".format(name)) from exc
 
     @abstractmethod
     def set_drivers(self, *args, **kwargs):

@@ -66,7 +66,7 @@ class TwoLayerVariantTester(ModelTester):
                 pint_msg = str(e)
 
             error_msg = re.escape(
-                "Wrong units for `{}`. {}".format(parameter, pint_msg)
+                "Wrong units for `{}`".format(parameter)
             )
             with pytest.raises(UnitError, match=error_msg):
                 self.tmodel(**{parameter: tinp})
