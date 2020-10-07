@@ -7,15 +7,13 @@ OpenSCM Two Layer Model
 | |PyPI|         | |PyPI Version|  |
 +----------------+-----------------+
 
-Work in progress.
-
 Brief summary
 +++++++++++++
 
 .. sec-begin-long-description
 .. sec-begin-index
 
-OpenSCM two layer model contains implementations of the two layer radiative forcing driven models by `Held et al. <https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1>`_, `Geoffroy et al. <https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1>`_ and `Bloch-Johnson et al. <https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/2015GL064240>`_.
+OpenSCM two layer model contains implementations of the two layer radiative forcing driven models by `Held et al. <https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1>`_, `Geoffroy et al. <https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1>`_ and `Bloch-Johnson et al. <https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/2015GL064240>`_
 
 .. sec-end-index
 
