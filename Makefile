@@ -71,6 +71,9 @@ docs: $(VENV_DIR)  ## build the docs
 test:  $(VENV_DIR) ## run the full testsuite
 	$(VENV_DIR)/bin/pytest --cov -rfsxEX --cov-report term-missing
 
+test-notebooks:  $(VENV_DIR) ## test the notebooks
+	$(VENV_DIR)/bin/pytest notebooks -r a --nbval --sanitize-with tests/notebook-tests.cfg
+
 test-install: $(VENV_DIR)  ## test whether installing in a fresh venv works
 	$(eval TEMPVENV := $(shell mktemp -d))
 	python3 -m venv $(TEMPVENV)
