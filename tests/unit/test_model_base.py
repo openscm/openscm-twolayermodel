@@ -62,8 +62,8 @@ class TwoLayerVariantTester(ModelTester):
 
             try:
                 tinp.to(default.units)
-            except pint.errors.DimensionalityError as e:
-                pint_msg = str(e)
+            except pint.errors.DimensionalityError:
+                pass
 
             error_msg = re.escape("Wrong units for `{}`".format(parameter))
             with pytest.raises(UnitError, match=error_msg):

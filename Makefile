@@ -77,7 +77,7 @@ test-notebooks:  $(VENV_DIR) ## test the notebooks
 test-install: $(VENV_DIR)  ## test whether installing in a fresh venv works
 	$(eval TEMPVENV := $(shell mktemp -d))
 	python3 -m venv $(TEMPVENV)
-	$(TEMPVENV)/bin/pip install pip --upgrade
+	$(TEMPVENV)/bin/pip install pip wheel --upgrade
 	$(TEMPVENV)/bin/pip install wheel 'setuptools>=41.2'
 	$(TEMPVENV)/bin/pip install .
 	$(TEMPVENV)/bin/python scripts/test_install.py
@@ -85,7 +85,7 @@ test-install: $(VENV_DIR)  ## test whether installing in a fresh venv works
 test-testpypi-install: $(VENV_DIR)  ## test whether installing from test PyPI works
 	$(eval TEMPVENV := $(shell mktemp -d))
 	python3 -m venv $(TEMPVENV)
-	$(TEMPVENV)/bin/pip install pip --upgrade
+	$(TEMPVENV)/bin/pip install pip wheel --upgrade
 	$(TEMPVENV)/bin/pip install wheel 'setuptools>=41.2'
 	# Install dependencies not on testpypi registry
 	$(TEMPVENV)/bin/pip install pandas
@@ -98,7 +98,7 @@ test-testpypi-install: $(VENV_DIR)  ## test whether installing from test PyPI wo
 test-pypi-install: $(VENV_DIR)  ## test whether installing from PyPI works
 	$(eval TEMPVENV := $(shell mktemp -d))
 	python3 -m venv $(TEMPVENV)
-	$(TEMPVENV)/bin/pip install pip --upgrade
+	$(TEMPVENV)/bin/pip install pip wheel --upgrade
 	$(TEMPVENV)/bin/pip install wheel 'setuptools>=41.2'
 	$(TEMPVENV)/bin/pip install openscm-twolayermodel --pre
 	$(TEMPVENV)/bin/python scripts/test_install.py
@@ -109,7 +109,7 @@ virtual-environment:  ## update venv, create a new venv if it doesn't exist
 $(VENV_DIR): setup.py
 	[ -d $(VENV_DIR) ] || python3 -m venv $(VENV_DIR)
 
-	$(VENV_DIR)/bin/pip install --upgrade pip
+	$(VENV_DIR)/bin/pip install --upgrade pip wheel
 	$(VENV_DIR)/bin/pip install -e .[dev] --use-feature=2020-resolver
 	$(VENV_DIR)/bin/jupyter nbextension enable --py widgetsnbextension
 
@@ -127,6 +127,6 @@ clean:
 first-venv: ## create a new virtual environment for the very first repo setup
 	python3 -m venv $(VENV_DIR)
 
-	$(VENV_DIR)/bin/pip install --upgrade pip
+	$(VENV_DIR)/bin/pip install --upgrade pip wheel
 	$(VENV_DIR)/bin/pip install versioneer
 	# don't touch here as we don't want this venv to persist anyway
