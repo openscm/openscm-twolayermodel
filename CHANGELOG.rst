@@ -17,6 +17,11 @@ The changes listed in this file are categorised as follows:
 master
 ------
 
+Added
+~~~~~
+
+- (`#7 <https://github.com/openscm/openscm-twolayermodel/pull/7>`_) JOSS paper draft
+
 v0.1.2 - 2020-31-07
 -------------------
 

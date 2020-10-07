@@ -10,7 +10,6 @@ import pint.errors
 import tqdm.autonotebook as tqdman
 from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
-from scmdata.timeseries import TimeSeries
 
 from .constants import DENSITY_WATER, HEAT_CAPACITY_WATER
 from .errors import UnitError
@@ -35,7 +34,7 @@ class Model(ABC):
         try:
             quantity.to(model_units)
         except pint.errors.DimensionalityError as exc:
-            raise UnitError("Wrong units for `{}`. {}".format(name, exc))
+            raise UnitError("Wrong units for `{}`".format(name)) from exc
 
     @abstractmethod
     def set_drivers(self, *args, **kwargs):
@@ -145,9 +144,9 @@ class TwoLayerVariant(Model):
     @staticmethod
     def _create_ts(base, unit, variable, values):
         out = base.copy()
-        out.meta["unit"] = unit
-        out.meta["variable"] = variable
-        out[:] = values
+        out.index = out.index.set_levels([unit], "unit")
+        out.index = out.index.set_levels([variable], "variable")
+        out.iloc[:, :] = values
 
         return out
 
@@ -230,26 +229,20 @@ class TwoLayerVariant(Model):
         for i, (label, row) in tqdman.tqdm(
             enumerate(driver_ts.iterrows()), desc="scenarios", leave=False
         ):
-            # TODO: ask Jared if there's  # pylint: disable=fixme
-            # a way to do this without going via timeseries but that still
-            # drops nans
             meta = dict(zip(driver_ts.index.names, label))
-
             row_no_nan = row.dropna()
-            ts = TimeSeries(data=row_no_nan.values, time=row_no_nan.index, attrs=meta)
 
-            self.set_drivers(ts.values * ur(ts.meta["unit"]))
+            self.set_drivers(row_no_nan.values * ur(meta["unit"]))
             self.reset()
             self.run()
 
-            out_run_tss = [ts]
-            out_run_tss += self._get_run_output_tss(ts)
+            out_run_tss_base = row_no_nan.to_frame().T
+            out_run_tss_base.index.names = driver_ts.index.names
 
-            # TODO: ask Jared how we can  # pylint: disable=fixme
-            # handle this better
-            out_run = ScmRun(row_no_nan, columns=meta)
-            out_run._ts = out_run_tss  # pylint: disable=protected-access
-            out_run = ScmRun(out_run.timeseries())
+            out_run_tss = [out_run_tss_base]
+            out_run_tss += self._get_run_output_tss(out_run_tss[0])
+
+            out_run = ScmRun(pd.concat(out_run_tss))
             out_run["run_idx"] = i
 
             run_store.append(out_run)
