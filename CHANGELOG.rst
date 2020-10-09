@@ -17,10 +17,18 @@ The changes listed in this file are categorised as follows:
 master
 ------
 
+v0.2.0 - 2020-10-09
+-------------------
+
 Added
 ~~~~~
 
 - (`#7 <https://github.com/openscm/openscm-twolayermodel/pull/7>`_) JOSS paper draft
+
+Changed
+~~~~~~~
+
+- (`#7 <https://github.com/openscm/openscm-twolayermodel/pull/7>`_) Require ``scmdata>=0.7``
 
 v0.1.2 - 2020-31-07
 -------------------

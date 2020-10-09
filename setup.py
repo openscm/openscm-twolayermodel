@@ -4,8 +4,8 @@ from setuptools.command.test import test as TestCommand
 
 PACKAGE_NAME = "openscm-twolayermodel"
 AUTHORS = [
-    ("Chris Smith", "c.j.smith1@leeds.ac.uk"),
     ("Zeb Nicholls", "zebedee.nicholls@climate-energy-college.org"),
+    ("Jared Lewis", "jared.lewis@climate-energy-college.org"),
 ]
 URL = "https://github.com/openscm/openscm-twolayermodel"
 
