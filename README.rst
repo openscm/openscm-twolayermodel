@@ -57,13 +57,13 @@ dependencies using
 Documentation
 -------------
 
-Documentation can be found at our `documentation pages <https://openscm-twolayermodel.readthedocs.io/en/latest/>`_
+Documentation can be found at our `documentation pages <https://openscm-two-layer-model.readthedocs.io/en/latest/>`_
 (we are thankful to `Read the Docs <https://readthedocs.org/>`_ for hosting us).
 
 Contributing
 ------------
 
-Please see the `Development section of the docs <https://openscm-twolayermodel.readthedocs.io/en/latest/development.html>`_.
+Please see the `Development section of the docs <https://openscm-two-layer-model.readthedocs.io/en/latest/development.html>`_.
 
 .. sec-begin-links
 
