@@ -230,7 +230,10 @@ class TwoLayerVariant(Model):
 
         driver_ts = driver.timeseries()
         for i, (label, row) in tqdman.tqdm(
-            enumerate(driver_ts.iterrows()), desc="scenarios", leave=False, disable=not(progress)
+            enumerate(driver_ts.iterrows()),
+            desc="scenarios",
+            leave=False,
+            disable=not (progress),
         ):
             meta = dict(zip(driver_ts.index.names, label))
             row_no_nan = row.dropna()
