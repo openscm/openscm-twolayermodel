@@ -20,7 +20,7 @@ master
 Changed
 ~~~~~~~
 
-- (`#20 <https://github.com/openscm/openscm-twolayermodel/pull/20>`_) Option to remove tqdm progress bar by passing `progress=False`
+- (`#20 <https://github.com/openscm/openscm-twolayermodel/pull/20>`_) Option to remove tqdm progress bar by passing ``progress=False``
 
 v0.2.0 - 2020-10-09
 -------------------
