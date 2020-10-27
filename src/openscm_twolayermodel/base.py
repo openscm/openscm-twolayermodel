@@ -173,7 +173,7 @@ class TwoLayerVariant(Model):
         )
 
     def run_scenarios(  # pylint:disable=too-many-locals
-        self, scenarios, driver_var="Effective Radiative Forcing"
+        self, scenarios, driver_var="Effective Radiative Forcing", progress=True,
     ):
         """
         Run scenarios.
@@ -191,6 +191,9 @@ class TwoLayerVariant(Model):
 
         driver_var : str
             The variable in ``scenarios`` to use as the driver of the model
+
+        progress : bool
+            Whether to display a progress bar
 
         Returns
         -------
@@ -227,7 +230,10 @@ class TwoLayerVariant(Model):
 
         driver_ts = driver.timeseries()
         for i, (label, row) in tqdman.tqdm(
-            enumerate(driver_ts.iterrows()), desc="scenarios", leave=False
+            enumerate(driver_ts.iterrows()),
+            desc="scenarios",
+            leave=False,
+            disable=not (progress),
         ):
             meta = dict(zip(driver_ts.index.names, label))
             row_no_nan = row.dropna()
