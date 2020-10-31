@@ -32,10 +32,8 @@ REQUIREMENTS_TESTS = [
     "pytest>=4.0",
     "scipy",
 ]
-REQUIREMENTS_DOCS = [
-    "ipywidgets",
+REQUIREMENTS_DOCS = REQUIREMENTS_NOTEBOOKS + [
     "nbsphinx",
-    "notebook",
     "sphinx>=1.4",
     "sphinx_rtd_theme",
     "sphinx-click",
