@@ -6,6 +6,9 @@ OpenSCM Two Layer Model
 +----------------+-----------------+
 | |PyPI|         | |PyPI Version|  |
 +----------------+-----------------+
+| |JOSS|         |                 |
++----------------+-----------------+
+
 
 Brief summary
 +++++++++++++
@@ -75,5 +78,7 @@ Please see the `Development section of the docs <https://openscm-two-layer-model
     :target: https://pypi.org/project/openscm-twolayermodel/
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/openscm-twolayermodel.svg
     :target: https://pypi.org/project/openscm-twolayermodel/
+.. |JOSS| image:: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857/status.svg
+    :target: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857
 
 .. sec-end-links
