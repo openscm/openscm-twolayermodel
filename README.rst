@@ -44,7 +44,7 @@ dependencies using
 
 .. code:: bash
 
-    pip install openscm-twolayermodel[notebooks]
+    pip install "openscm-twolayermodel[notebooks]"
 
 **Coming soon** OpenSCM two layer model can also be installed with conda
 
