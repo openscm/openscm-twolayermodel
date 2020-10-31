@@ -20,7 +20,7 @@ master
 Changed
 ~~~~~~~
 
-- (`#21 <https://github.com/openscm/openscm-twolayermodel/pull/21>`_) Quoted pip install instructions to ensure cross-shell compatibility (closes `#16 <https://github.com/openscm/openscm-twolayermodel/issues/16>`_)
+- (`#21 <https://github.com/openscm/openscm-twolayermodel/pull/21>`_) Quoted pip install instructions to ensure cross-shell compatibility following `JOSS review <https://github.com/openjournals/joss-reviews/issues/2766>`_ (closes `#16 <https://github.com/openscm/openscm-twolayermodel/issues/16>`_)
 - (`#20 <https://github.com/openscm/openscm-twolayermodel/pull/20>`_) Option to remove tqdm progress bar by passing ``progress=False``
 
 v0.2.0 - 2020-10-09
