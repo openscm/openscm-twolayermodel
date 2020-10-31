@@ -33,6 +33,7 @@ REQUIREMENTS_TESTS = [
     "scipy",
 ]
 REQUIREMENTS_DOCS = [
+    "ipywidgets",
     "nbsphinx",
     "notebook",
     "sphinx>=1.4",
