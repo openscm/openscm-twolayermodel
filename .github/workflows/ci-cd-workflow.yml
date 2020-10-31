@@ -29,6 +29,7 @@ jobs:
         bandit -c .bandit.yml -r openscm_twolayermodel
         flake8 src tests setup.py
     - name: Build docs
+      uses: docker://pandoc/core:2.9
       # treat warnings as errors (-W)...
       # ...but not when being nitpicky (-n)
       run: |
