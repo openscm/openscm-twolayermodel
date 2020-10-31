@@ -15,6 +15,15 @@ Brief summary
 
 OpenSCM two layer model contains implementations of the two layer radiative forcing driven models by `Held et al. <https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1>`_, `Geoffroy et al. <https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1>`_ and `Bloch-Johnson et al. <https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/2015GL064240>`_
 
+OpenSCM Two Layer Model was designed to provide a clean, modularised, extensible interface for one of the most commonly used simple climate models.
+It was used in `Phase 1 of the Reduced Complexity Model Intercomparison Project <https://doi.org/10.5194/gmd-2019-375>`_ as a point of comparison for the other participating models.
+
+The `FaIR model <https://github.com/OMS-NetZero/FAIR>`_ implements a mathematically equivalent model but does not provide as clear a conversion between the two-layer model and the two-timescale response as is provided here.
+We hope that this implementation could interface with other simple climate models like FaIR to allow simpler exploration of the combined behaviour of interacting climate components with minimal coupling headaches.
+
+As implemented here, the "OpenSCM Two Layer Model" interface is target at researchers and as an education tool.
+Users from other fields are of course encouraged to use it if they find it helpful.
+
 .. sec-end-index
 
 License
