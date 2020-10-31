@@ -17,6 +17,11 @@ The changes listed in this file are categorised as follows:
 master
 ------
 
+Added
+~~~~~
+
+- (`#20 <https://github.com/openscm/openscm-twolayermodel/pull/20>`_) Statement of need to the README following `JOSS review <https://github.com/openjournals/joss-reviews/issues/2766>`_ (closes `#18 <https://github.com/openscm/openscm-twolayermodel/issues/18>`_)
+
 Changed
 ~~~~~~~
 
