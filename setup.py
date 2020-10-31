@@ -34,6 +34,7 @@ REQUIREMENTS_TESTS = [
 ]
 REQUIREMENTS_DOCS = [
     "nbsphinx",
+    "notebook",
     "sphinx>=1.4",
     "sphinx_rtd_theme",
     "sphinx-click",
