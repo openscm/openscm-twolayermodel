@@ -33,7 +33,12 @@ REQUIREMENTS_TESTS = [
     "scipy",
 ]
 REQUIREMENTS_DOCS = [
-    "nbsphinx", "sphinx>=1.4", "sphinx_rtd_theme", "sphinx-click","sphinx-copybutton"]
+    "nbsphinx",
+    "sphinx>=1.4",
+    "sphinx_rtd_theme",
+    "sphinx-click",
+    "sphinx-copybutton",
+]
 REQUIREMENTS_DEPLOY = ["twine>=1.11.0", "setuptools>=38.6.0", "wheel>=0.31.0"]
 
 REQUIREMENTS_DEV = [
