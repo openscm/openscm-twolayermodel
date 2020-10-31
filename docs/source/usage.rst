@@ -18,3 +18,13 @@ Basic demos
    :maxdepth: 1
 
    usage/getting-started.ipynb
+   usage/running-scenarios.ipynb
+
+More detail
++++++++++++
+
+.. toctree::
+   :maxdepth: 1
+
+   usage/impulse-response-equivalence.ipynb
+   usage/one-layer-model.ipynb

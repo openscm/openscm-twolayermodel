@@ -208,7 +208,7 @@ coverage_write_headline = False  # do not write headlines.
 
 ## nbsphinx
 
-nbsphinx_execute = 'auto'
+nbsphinx_execute = 'always'
 
 # -- Options for intersphinx extension ---------------------------------------
 
