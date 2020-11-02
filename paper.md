@@ -36,6 +36,15 @@ The upper layer absorbs excess heat in the Earth System and then exchanges heat 
 As a result, in response to a perturbation, the model responds with a distinctive two-timescale response, commonly referred to as the "fast" and "slow" warming components.
 Since @held_2010_two_layer, the model has been extended to include updated representations of the efficiency of ocean heat uptake [@geoffroy_2013_two_layer2] as well as a state-dependent response to radiative forcing [@bloch_johnson_2015_feedback_dependence; @rohrschneider_2019_simple].
 
+There are many simple climate models in the scientific literature [@rcmip_phase_1].
+Given the context of this paper, below we provide a table of openly accessible models, their programming language and approach (see Table 1 of @rcmip_phase_1 for a wider ranging overview).
+
+| Model | Brief description | Programming language |
+|-------|-------------------|----------------------|
+| [FaIR](https://github.com/OMS-NetZero/FAIR) | Modified impulse response [@smith_2018_fairv1_3] | Python (github.com/OMS-NetZero/FAIR) |
+| [GREB](https://github.com/christianstassen/greb-official) | Coarse grid energy balance [@Dommenget_2011_greb] | Fortran 90 (github.com/christianstassen/greb-official) |
+| [Hector](https://github.com/JGCRI/hector) | Upwelling-diffusion ocean energy balance [@hartin_2015_hector] | C++ (github.com/JGCRI/hector) |
+
 "OpenSCM Two Layer Model" is an object-oriented, open-source implementation of the two-layer model.
 It is written in Python, a user-friendly open-source language which is popular in the climate sciences, and uses the Pint [@pint] package, a widely used units library, for unit handling.
 It provides an extensible interface for the two-layer model, which could then be coupled with other modules as researchers see fit.
