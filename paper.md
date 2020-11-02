@@ -49,9 +49,6 @@ For a more extensive list of simple climate models, see Table 1 of @rcmip_phase_
 | [OSCAR](https://github.com/tgasser/OSCAR) | Energy balance with book-keeping land carbon cycle [@Gasser_2020_asdfjk] | Python (github.com/tgasser/OSCAR) |
 | [WASP](https://github.com/WASP-ESM/WASP_Earth_System_Model) | Energy balance with 8-box carbon cycle [@Goodwin_2019_ggfp6s] | C++ (github.com/WASP-ESM/WASP_Earth_System_Model) |
 
-
-
-
 "OpenSCM Two Layer Model" is an object-oriented, open-source implementation of the two-layer model.
 It is written in Python, a user-friendly open-source language which is popular in the climate sciences, and uses the Pint [@pint] package, a widely used units library, for unit handling.
 It provides an extensible interface for the two-layer model, which could then be coupled with other modules as researchers see fit.
@@ -63,7 +60,7 @@ The conversion between the two is an implementation of the proof by @geoffroy_20
 OpenSCM Two Layer Model was designed to provide a clean, modularised, extensible interface for one of the most commonly used simple climate models.
 It was used in Phase 1 of the Reduced Complexity Model Intercomparison Project [@rcmip_phase_1] as a point of comparison for the other participating models.
 
-The FaIR model [@fair_repo] implements a mathematically equivalent model but does not provide as clear a conversion between the two-layer model and the two-timescale response as is provided here.
+The FaIR model [@fair_repo] implements a mathematically equivalent model (under certain assumptions) but does not provide as clear a conversion between the two-layer model and the two-timescale response as is provided here.
 We hope that this implementation could interface with other simple climate models like FaIR to allow simpler exploration of the combined behaviour of interacting climate components with minimal coupling headaches.
 
 As implemented here, the "OpenSCM Two Layer Model" interface is intended to be used in research or education.
