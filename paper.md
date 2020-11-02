@@ -37,7 +37,8 @@ As a result, in response to a perturbation, the model responds with a distinctiv
 Since @held_2010_two_layer, the model has been extended to include updated representations of the efficiency of ocean heat uptake [@geoffroy_2013_two_layer2] as well as a state-dependent response to radiative forcing [@bloch_johnson_2015_feedback_dependence; @rohrschneider_2019_simple].
 
 There are many simple climate models in the scientific literature [@rcmip_phase_1].
-Given the context of this paper, below we provide a table of openly accessible models, their programming language and approach (see Table 1 of @rcmip_phase_1 for a wider ranging overview).
+Given the context of this paper, below we provide a table of openly accessible models, their programming language and approach.
+For a more extensive list of simple climate models, see Table 1 of @rcmip_phase_1.
 
 | Model | Brief description | Programming language |
 |-------|-------------------|----------------------|
