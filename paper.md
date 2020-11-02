@@ -45,6 +45,12 @@ For a more extensive list of simple climate models, see Table 1 of @rcmip_phase_
 | [FaIR](https://github.com/OMS-NetZero/FAIR) | Modified impulse response [@smith_2018_fairv1_3] | Python (github.com/OMS-NetZero/FAIR) |
 | [GREB](https://github.com/christianstassen/greb-official) | Coarse grid energy balance [@Dommenget_2011_greb] | Fortran 90 (github.com/christianstassen/greb-official) |
 | [Hector](https://github.com/JGCRI/hector) | Upwelling-diffusion ocean energy balance [@hartin_2015_hector] | C++ (github.com/JGCRI/hector) |
+| [MAGICC](live.magicc.org) | Upwelling-diffusion ocean four-box (hemispheric land/ocean) energy balance [@Meinshausen_2011_magicc] | Fortran 90 (live.magicc.org, Pymagicc [@Gieseke_2018_pymagicc] provides a Python wrapper at github.com/openclimatedata/pymagicc) |
+| [OSCAR](https://github.com/tgasser/OSCAR) | Energy balance with book-keeping land carbon cycle [@Gasser_2020_asdfjk] | Python (github.com/tgasser/OSCAR) |
+| [WASP](https://github.com/WASP-ESM/WASP_Earth_System_Model) | Energy balance with 8-box carbon cycle [@Goodwin_2019_ggfp6s] | C++ (github.com/WASP-ESM/WASP_Earth_System_Model) |
+
+
+
 
 "OpenSCM Two Layer Model" is an object-oriented, open-source implementation of the two-layer model.
 It is written in Python, a user-friendly open-source language which is popular in the climate sciences, and uses the Pint [@pint] package, a widely used units library, for unit handling.
