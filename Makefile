@@ -28,7 +28,7 @@ checks: $(VENV_DIR)  ## run all the checks
 		echo "\n\n=== isort ==="; $(VENV_DIR)/bin/isort --check-only --quiet --recursive src tests setup.py || echo "--- isort failed ---" >&2; \
 		echo "\n\n=== pydocstyle ==="; $(VENV_DIR)/bin/pydocstyle src || echo "--- pydocstyle failed ---" >&2; \
 		echo "\n\n=== pylint ==="; $(VENV_DIR)/bin/pylint src || echo "--- pylint failed ---" >&2; \
-		echo "\n\n=== notebook tests ==="; $(VENV_DIR)/bin/pytest notebooks -r a --nbval --sanitize-with tests/notebook-tests.cfg || echo "--- notebook tests failed ---" >&2; \
+		echo "\n\n=== notebook tests ==="; $(VENV_DIR)/bin/pytest $(NOTEBOOKS_DIR)k -r a --nbval --sanitize-with tests/notebook-tests.cfg || echo "--- notebook tests failed ---" >&2; \
 		echo "\n\n=== tests ==="; $(VENV_DIR)/bin/pytest tests -r a --cov=openscm_twolayermodel --cov-report='' \
 			&& $(VENV_DIR)/bin/coverage report --fail-under=95 || echo "--- tests failed ---" >&2; \
 		echo
@@ -110,7 +110,7 @@ $(VENV_DIR): setup.py
 	[ -d $(VENV_DIR) ] || python3 -m venv $(VENV_DIR)
 
 	$(VENV_DIR)/bin/pip install --upgrade pip wheel
-	$(VENV_DIR)/bin/pip install -e ".[dev]" --use-feature=2020-resolver
+	$(VENV_DIR)/bin/pip install -e ".[dev]"
 	$(VENV_DIR)/bin/jupyter nbextension enable --py widgetsnbextension
 
 	touch $(VENV_DIR)
