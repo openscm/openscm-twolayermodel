@@ -18,7 +18,7 @@ README = "README.rst"
 
 SOURCE_DIR = "src"
 
-REQUIREMENTS = ["openscm-units", "scmdata>=0.7", "tqdm"]
+REQUIREMENTS = ["scmdata>=0.7.4", "tqdm"]
 REQUIREMENTS_NOTEBOOKS = [
     "ipywidgets",
     "notebook",
