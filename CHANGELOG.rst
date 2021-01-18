@@ -17,6 +17,11 @@ The changes listed in this file are categorised as follows:
 master
 ------
 
+Changed
+~~~~~~~
+
+- (`#27 <https://github.com/openscm/openscm-twolayermodel/pull/27>`_) Fixed the discussion (in the relevant notebook) of how a one-layer model can be made from the two-layer implementation here
+
 v0.2.1 - 2020-12-23
 -------------------
 
