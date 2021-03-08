@@ -43,10 +43,10 @@ To get setup as a developer, we recommend the following steps (if any of these t
     #. Change your current directory to OpenSCM Two Layer Model's root directory (i.e. the one which contains ``README.rst``), ``cd openscm-twolayermodel``
     #. Create a virtual environment to use with OpenSCM Two Layer Model ``python3 -m venv venv``
     #. Activate your virtual environment ``source ./venv/bin/activate``
-    #. Upgrade pip ``pip intall --upgrade pip``
+    #. Upgrade pip ``pip install --upgrade pip``
     #. Install the development dependencies (very important, make sure your virtual environment is active before doing this) ``pip install -e .[dev]``
 
-#. Make sure the tests pass by running ``make check``, if that fails the commands can be read out of the ``Makefile``
+#. Make sure the tests pass by running ``make checks``, if that fails the commands can be read out of the ``Makefile``
 
 
 Getting help
