@@ -45,6 +45,15 @@ OpenSCM two layer model is free software under a BSD 3-Clause License, see
 Installation
 ------------
 
+OpenSCM two layer model has only two dependencies:
+
+.. begin-dependencies
+
+- scmdata>=0.9
+- tqdm
+
+.. end-dependencies
+
 OpenSCM two layer model can be installed with pip
 
 .. code:: bash
@@ -70,7 +79,7 @@ If you wish to run the tests, you must install from source (or download the test
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
 
-To install from source, simply clone the repository and then install it using pip e.g. ``pip install .``.
+To install from source, simply clone the repository and then install it using pip e.g. ``pip install ".[dev]"``.
 Having done this, the tests can be run with ``pytest tests`` or using the ``Makefile`` (``make test`` will run only the code tests, ``make checks`` will run the code tests and all other tests e.g. linting, notebooks, documentation).
 
 .. sec-end-installation
