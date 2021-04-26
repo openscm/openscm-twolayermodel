@@ -38,7 +38,10 @@ Since @held_2010_two_layer, the model has been extended to include updated repre
 
 There are many simple climate models in the scientific literature [@rcmip_phase_1].
 Given the context of this paper, below we provide a table of openly accessible models, their programming language and approach.
-For a more extensive list of simple climate models, see Table 1 of @rcmip_phase_1.
+These models are conceptually similar to the two-layer model implemented here except they use different parameterisations for ocean heat uptake and the relationship between ocean heat uptake and warming.
+On top of the relationship between ocean heat uptake and warming, these models also implement many other components of the climate system e.g. carbon cycle, methane cycle and the relationship between changes in atmospheric greenhouse gas concentrations and atmospheric energy fluxes.
+The exception is the FaIR model [@smith_2018_fairv1_3], which uses the two-layer model as its thermal core.
+For a more extensive list of simple climate models and references which describe the models in detail, see Table 1 of @rcmip_phase_1.
 
 | Model | Brief description | Programming language |
 |-------|-------------------|----------------------|
