@@ -10,14 +10,16 @@ tags:
 authors:
   - name: Zebedee R. J. Nicholls
     orcid: 0000-0003-0872-7098
-    affiliation: "1, 2"
+    affiliation: "1, 2, 3"
   - name: Jared Lewis
-    affiliation: 1
+    affiliation: "1, 2"
 affiliations:
  - name: Australian-German Climate & Energy College, The University of Melbourne, Parkville, Victoria, Australia
    index: 1
- - name: School of Earth Sciences, The University of Melbourne, Parkville, Victoria, Australia
+ - name: School of Geography, Earth and Atmosphere Sciences, The University of Melbourne, Parkville, Victoria, Australia
    index: 2
+ - name: Climate Resource, Northcote, Victoria, Australia
+   index: 3
 date: 7 October 2020
 bibliography: paper.bib
 ---
