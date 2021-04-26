@@ -64,7 +64,18 @@ dependencies using
 
     conda install -c conda-forge openscm-twolayermodel
 
+We do not ship our tests with the packages.
+If you wish to run the tests, you must install from source (or download the tests separately and run them on your installation).
+
+Installing from source
+~~~~~~~~~~~~~~~~~~~~~~
+
+To install from source, simply clone the repository and then install it using pip e.g. ``pip install .``.
+Having done this, the tests can be run with ``pytest tests`` or using the ``Makefile`` (``make test`` will run only the code tests, ``make checks`` will run the code tests and all other tests e.g. linting, notebooks, documentation).
+
 .. sec-end-installation
+
+For more details, see the `development section of the docs <https://openscm-two-layer-model.readthedocs.io/en/latest/development.html>`_.
 
 Documentation
 -------------
