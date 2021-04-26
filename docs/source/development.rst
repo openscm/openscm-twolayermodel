@@ -21,7 +21,7 @@ All contributions are welcome, some possible suggestions include:
 - pull requests
 
 Please report issues or discuss feature requests in the `OpenSCM Two Layer Model issue tracker`_.
-If your issue is a feature request or a bug, please use the templates available, otherwise, simply open a normal issue :)
+If your issue is a feature request or a bug, please use the templates available, otherwise, simply open a normal issue.
 
 As a contributor, please follow a couple of conventions:
 

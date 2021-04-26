@@ -83,6 +83,16 @@ Documentation
 Documentation can be found at our `documentation pages <https://openscm-two-layer-model.readthedocs.io/en/latest/>`_
 (we are thankful to `Read the Docs <https://readthedocs.org/>`_ for hosting us).
 
+Getting help
+------------
+
+.. sec-begin-getting-help
+
+If you have any issues or would like to discuss a feature request, please raise them in the `OpenSCM Two Layer Model issue tracker`_.
+If your issue is a feature request or a bug, please use the templates available, otherwise, simply open a normal issue.
+
+.. sec-end-getting-help
+
 Contributing
 ------------
 
@@ -100,5 +110,6 @@ Please see the `Development section of the docs <https://openscm-two-layer-model
     :target: https://pypi.org/project/openscm-twolayermodel/
 .. |JOSS| image:: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857/status.svg
     :target: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857
+.. _OpenSCM Two Layer Model issue tracker: https://github.com/openscm/openscm-twolayermodel/issues
 
 .. sec-end-links
