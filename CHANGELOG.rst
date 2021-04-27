@@ -20,6 +20,7 @@ master
 Changed
 ~~~~~~~
 
+- (`#32 <https://github.com/openscm/openscm-twolayermodel/pull/32>`_) Include ``LICENSE``, ``README.rst`` and ``CHANGELOG`` in package
 - (`#30 <https://github.com/openscm/openscm-twolayermodel/pull/30>`_) Require ``scmdata>=0.9``
 - (`#27 <https://github.com/openscm/openscm-twolayermodel/pull/27>`_) Fixed the discussion (in the relevant notebook) of how a one-layer model can be made from the two-layer implementation here
 
