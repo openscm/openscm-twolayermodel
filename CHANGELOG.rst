@@ -20,7 +20,13 @@ master
 Changed
 ~~~~~~~
 
+- (`#30 <https://github.com/openscm/openscm-twolayermodel/pull/30>`_) Require ``scmdata>=0.9``
 - (`#27 <https://github.com/openscm/openscm-twolayermodel/pull/27>`_) Fixed the discussion (in the relevant notebook) of how a one-layer model can be made from the two-layer implementation here
+
+Fixed
+~~~~~
+
+- (`#30 <https://github.com/openscm/openscm-twolayermodel/pull/30>`_) Incorrect call to :meth:`scmdata.ScmRun` in tests
 
 v0.2.1 - 2020-12-23
 -------------------

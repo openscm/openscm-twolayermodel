@@ -14,6 +14,10 @@ OpenSCM Two Layer Model
     :start-after: sec-begin-license
     :end-before: sec-end-license
 
+.. include:: ../../README.rst
+    :start-after: sec-begin-getting-help
+    :end-before: sec-end-getting-help
+
 .. toctree::
     :maxdepth: 2
     :caption: Documentation

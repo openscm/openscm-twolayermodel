@@ -1,10 +1,10 @@
-.. development:
+.. _development:
 
 Development
 ===========
 
 If you're interested in contributing to OpenSCM Two Layer Model, we'd love to have you on board!
-This section of the docs will (once we've written it) detail how to get setup to contribute and how best to communicate.
+This section of the docs details how to get setup to contribute and how best to communicate.
 
 .. contents:: :local:
 
@@ -21,7 +21,7 @@ All contributions are welcome, some possible suggestions include:
 - pull requests
 
 Please report issues or discuss feature requests in the `OpenSCM Two Layer Model issue tracker`_.
-If your issue is a feature request or a bug, please use the templates available, otherwise, simply open a normal issue :)
+If your issue is a feature request or a bug, please use the templates available, otherwise, simply open a normal issue.
 
 As a contributor, please follow a couple of conventions:
 

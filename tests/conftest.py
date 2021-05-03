@@ -98,12 +98,12 @@ def run_model_output_comparison(tmpdir):
         """
         if update:
             print("Updating {}".format(expected))
-            res.to_csv(expected, index=False)
+            res.to_csv(expected)
         else:
             # scmdata bug: the saving and loading process mangles the column
             # names so we have to save to disk before checking
             tmpfile = os.path.join(tmpdir, "res.csv")
-            res.to_csv(tmpfile, index=False)
+            res.to_csv(tmpfile)
             assert_scmruns_allclose(ScmRun(tmpfile), ScmRun(expected))
 
         if update:

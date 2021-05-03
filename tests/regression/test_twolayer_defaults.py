@@ -1,5 +1,6 @@
 import os.path
 
+import pytest
 from openscm_units import unit_registry as ur
 
 from openscm_twolayermodel import TwoLayerModel
@@ -33,6 +34,8 @@ def test_twolayer_plus_efficacy(
     run_model_output_comparison(res, expected, update_expected_files)
 
 
+@pytest.mark.filterwarnings("ignore:overflow encountered")
+@pytest.mark.filterwarnings("ignore:invalid value encountered")
 def test_twolayer_plus_state_dependence(
     update_expected_files,
     test_rcmip_forcings_scmrun,
