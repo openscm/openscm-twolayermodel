@@ -117,6 +117,7 @@ $(VENV_DIR): setup.py
 
 paper.pdf: paper.md paper.bib latex.template
 	pandoc --filter pandoc-citeproc --bibliography paper.bib  paper.md \
+		--from markdown+grid_tables \
   		--template latex.template -o paper.pdf \
   		--pdf-engine=xelatex
 
