@@ -61,7 +61,7 @@ OpenSCM two layer model has only two dependencies:
 
 .. begin-dependencies
 
-- openscm-twolayermodel>=0.9
+- scmdata>=0.9
 - tqdm
 
 .. end-dependencies
@@ -135,10 +135,8 @@ Please see the `Development section of the docs <https://openscm-two-layer-model
     :target: https://pypi.org/project/openscm-twolayermodel/
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/openscm-twolayermodel.svg
     :target: https://pypi.org/project/openscm-twolayermodel/
-
 .. |conda install| image:: https://github.com/openscm/openscm-twolayermodel/workflows/Test%20conda%20install/badge.svg
     :target: https://github.com/openscm/openscm-twolayermodel/actions?query=workflow%3A%22Test+conda+install%22
-
 .. |conda platforms| image:: https://img.shields.io/conda/pn/conda-forge/openscm-twolayermodel.svg
     :target: https://anaconda.org/conda-forge/openscm-twolayermodel
 .. |conda version| image:: https://img.shields.io/conda/vn/conda-forge/openscm-twolayermodel.svg
