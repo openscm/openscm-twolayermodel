@@ -1,12 +1,12 @@
-name: Test PyPI install
+name: Test conda install
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '0 * * * 3'
+    - cron:  '0 0 * * 3'
 
 jobs:
   test-installation:
-    name: Test PyPI install (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Test conda install (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -14,19 +14,22 @@ jobs:
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
-    - name: Setup python
-      uses: actions/setup-python@v1
+    - name: Setup conda
+      uses: conda-incubator/setup-miniconda@v2.0.1
       with:
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
+        activate-environment: test
+    - name: Conda info
+      shell: bash -l {0}
+      run: conda info
     - name: Install package
-      # install basic first, then install pre-releases afterwards so we don't
-      # pick up pre-releases of dependencies (e.g. pandas)
-      run: |
-        pip install --upgrade pip
-        pip install openscm-twolayermodel
-        pip install openscm-twolayermodel --pre
+      shell: bash -l {0}
+      run: conda install -c conda-forge openscm-twolayermodel
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Test installation
+      shell: bash -l {0}
       run: |
+        which python
         python scripts/test_install.py
