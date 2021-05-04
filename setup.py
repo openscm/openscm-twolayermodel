@@ -14,7 +14,27 @@ DESCRIPTION = (
     "`Held et al. <https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1>`_ "
     "and `Geoffroy et al. <https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1>`_"
 )
+LICENSE = "3-Clause BSD License",
+KEYWORDS = [
+    "openscm-twolayermodel",
+    "openscm",
+    "python",
+    "repo",
+    "simple",
+    "climate",
+    "model",
+]
 README = "README.rst"
+CLASSIFIERS = [  # full list at https://pypi.org/pypi?%3Aaction=list_classifiers
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
 
 SOURCE_DIR = "src"
 
@@ -107,25 +127,9 @@ setup(
     author=", ".join([author[0] for author in AUTHORS]),
     author_email=", ".join([author[1] for author in AUTHORS]),
     url=URL,
-    license="3-Clause BSD License",
-    classifiers=[  # full list at https://pypi.org/pypi?%3Aaction=list_classifiers
-        "Development Status :: 4 - Beta",
-        "License :: OSI Approved :: BSD License",
-        "Intended Audience :: Developers",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-    ],
-    keywords=[
-        "openscm-twolayermodel",
-        "openscm",
-        "python",
-        "repo",
-        "simple",
-        "climate",
-        "model",
-    ],
+    license=LICENSE,
+    classifiers=CLASSIFIERS,
+    keywords=KEYWORDS,
     packages=find_packages(SOURCE_DIR),  # no exclude as only searching in `src`
     package_dir={"": SOURCE_DIR},
     # include_package_data=True,
