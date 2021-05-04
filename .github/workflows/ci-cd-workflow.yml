@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
     - name: Checkout repository
@@ -66,21 +66,26 @@ jobs:
         pip install -e .[tests]
     - name: Test with pytest
       env:
-        MIN_COVERAGE: 70  # TODO: put this back up to 95 once we start writing
+        MIN_COVERAGE: 95
       run: |
-          pytest tests -r a --cov=openscm_twolayermodel --cov-report=''
+          pytest tests -r a --cov=openscm_twolayermodel --cov-report=xml
           if ! coverage report --fail-under=${MIN_COVERAGE} --show-missing
           then
               echo
               echo "Error: Test coverage has to be at least ${MIN_COVERAGE}"
               exit 1
           fi
+    - name: Upload coverage to Codecov
+      if: startsWith(runner.os, 'Linux') && matrix.python-version == 3.7
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
 
   test-notebooks:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
     - name: Checkout repository

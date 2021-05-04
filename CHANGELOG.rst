@@ -17,6 +17,11 @@ The changes listed in this file are categorised as follows:
 master
 ------
 
+Added
+~~~~~
+
+- (`#33 <https://github.com/openscm/openscm-twolayermodel/pull/33>`_) Information in README and testing for conda install
+
 Changed
 ~~~~~~~
 
