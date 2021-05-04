@@ -14,7 +14,7 @@ DESCRIPTION = (
     "`Held et al. <https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1>`_ "
     "and `Geoffroy et al. <https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1>`_"
 )
-LICENSE = "3-Clause BSD License",
+LICENSE = "3-Clause BSD License"
 KEYWORDS = [
     "openscm-twolayermodel",
     "openscm",
