@@ -1,13 +1,25 @@
 OpenSCM Two Layer Model
 =======================
 
-+----------------+-----------------+
-| |CI CD|        | |PyPI Install|  |
-+----------------+-----------------+
-| |PyPI|         | |PyPI Version|  |
-+----------------+-----------------+
-| |JOSS|         |                 |
-+----------------+-----------------+
++-------------------+----------------+--------------+
+| Repository health |    |CI CD|     |  |Coverage|  |
++-------------------+----------------+--------------+
+
++---------------+--------+--------+
+| Documentation | |Docs| | |JOSS| |
++---------------+--------+--------+
+
++------+------------------+----------------+------------------+
+| Pypi |  |PyPI Install|  |     |PyPI|     |  |PyPI Version|  |
++------+------------------+----------------+------------------+
+
++-------+-----------------+-------------------+-----------------+
+| Conda | |conda install| | |conda platforms| | |conda version| |
++-------+-----------------+-------------------+-----------------+
+
++-----------------+----------------+---------------+-----------+
+|   Other info    | |Contributors| | |Last Commit| | |License| |
++-----------------+----------------+---------------+-----------+
 
 
 Brief summary
@@ -49,7 +61,7 @@ OpenSCM two layer model has only two dependencies:
 
 .. begin-dependencies
 
-- scmdata>=0.9
+- openscm-twolayermodel>=0.9
 - tqdm
 
 .. end-dependencies
@@ -111,13 +123,31 @@ Please see the `Development section of the docs <https://openscm-two-layer-model
 
 .. |CI CD| image:: https://github.com/openscm/openscm-twolayermodel/workflows/OpenSCM%20Two%20Layer%20Model%20CI-CD/badge.svg
     :target: https://github.com/openscm/openscm-twolayermodel/actions?query=workflow%3A%22OpenSCM+Two+Layer+Model+CI-CD%22
+.. |Coverage| image:: https://codecov.io/gh/openscm/openscm-twolayermodel/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/openscm/openscm-twolayermodel
+.. |Docs| image:: https://readthedocs.org/projects/openscm-two-layer-model/badge/?version=latest
+    :target: https://openscm-two-layer-model.readthedocs.io/en/latest/?badge=latest
+.. |JOSS| image:: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857/status.svg
+    :target: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857
 .. |PyPI Install| image:: https://github.com/openscm/openscm-twolayermodel/workflows/Test%20PyPI%20install/badge.svg
     :target: https://github.com/openscm/openscm-twolayermodel/actions?query=workflow%3A%22Test+PyPI+install%22
 .. |PyPI| image:: https://img.shields.io/pypi/pyversions/openscm-twolayermodel.svg
     :target: https://pypi.org/project/openscm-twolayermodel/
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/openscm-twolayermodel.svg
     :target: https://pypi.org/project/openscm-twolayermodel/
-.. |JOSS| image:: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857/status.svg
-    :target: https://joss.theoj.org/papers/94a3759c9ea117499b90c56421ef4857
+
+.. |conda install| image:: https://github.com/openscm/openscm-twolayermodel/workflows/Test%20conda%20install/badge.svg
+    :target: https://github.com/openscm/openscm-twolayermodel/actions?query=workflow%3A%22Test+conda+install%22
+
+.. |conda platforms| image:: https://img.shields.io/conda/pn/conda-forge/openscm-twolayermodel.svg
+    :target: https://anaconda.org/conda-forge/openscm-twolayermodel
+.. |conda version| image:: https://img.shields.io/conda/vn/conda-forge/openscm-twolayermodel.svg
+    :target: https://anaconda.org/conda-forge/openscm-twolayermodel
+.. |Contributors| image:: https://img.shields.io/github/contributors/openscm/openscm-twolayermodel.svg
+    :target: https://github.com/openscm/openscm-twolayermodel/graphs/contributors
+.. |Last Commit| image:: https://img.shields.io/github/last-commit/openscm/openscm-twolayermodel.svg
+    :target: https://github.com/openscm/openscm-twolayermodel/commits/master
+.. |License| image:: https://img.shields.io/github/license/openscm/openscm-twolayermodel.svg
+    :target: https://github.com/openscm/openscm-twolayermodel/blob/master/LICENSE
 
 .. sec-end-links
