@@ -75,6 +75,11 @@ jobs:
               echo "Error: Test coverage has to be at least ${MIN_COVERAGE}"
               exit 1
           fi
+    - name: Upload coverage to Codecov
+      if: startsWith(runner.os, 'Linux') && matrix.python-version == 3.7
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
 
   test-notebooks:
     runs-on: ubuntu-latest
