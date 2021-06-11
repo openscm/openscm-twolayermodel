@@ -41,7 +41,7 @@ Since @held_2010_two_layer, the model has been extended to include updated repre
 There are many simple climate models in the scientific literature [@rcmip_phase_1].
 Given the context of this paper, below we provide a table of openly accessible models, their programming language and approach.
 These models are conceptually similar to the two-layer model implemented here except they use different parameterisations for ocean heat uptake and the relationship between ocean heat uptake and warming.
-On top of the relationship between ocean heat uptake and warming, these models also implement many other components of the climate system e.g. carbon cycle, methane cycle and the relationship between changes in atmospheric greenhouse gas concentrations and atmospheric energy fluxes.
+On top of the relationship between ocean heat uptake and warming, these models also implement many other components of the climate system, e.g. carbon cycle, methane cycle and the relationship between changes in atmospheric greenhouse gas concentrations and atmospheric energy fluxes.
 The exception is the FaIR model [@smith_2018_fairv1_3], which uses the two-layer model as its thermal core.
 
 +-------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------+
@@ -63,8 +63,8 @@ The exception is the FaIR model [@smith_2018_fairv1_3], which uses the two-layer
 
   : Brief overview of other simple climate models available in the scientific literature. Shown is the model name, a brief description and relevant URL(s) and the programming language in which the model is written. The programming language shown is the one used for the model's core, other languages might be used in the development repositories for e.g. plotting. For a more extensive list of simple climate models and references which describe the models in detail, see Table 1 of @rcmip_phase_1.
 
-"OpenSCM Two Layer Model" is an object-oriented, open-source implementation of the two-layer model.
-It is written in Python, a user-friendly open-source language which is popular in the climate sciences, and uses the Pint [@pint] package, a widely used units library, for unit handling.
+OpenSCM Two Layer Model is an object-oriented and open-source implementation of the two-layer model.
+It is written in Python, a user-friendly open-source language which is popular in the climate sciences, and uses the Pint package [@pint], a widely used units library, for unit handling.
 It provides an extensible interface for the two-layer model, which could then be coupled with other modules as researchers see fit.
 The implementation also provides an easy way to convert between the two-layer model of @held_2010_two_layer and the mathematically equivalent two-timescale impulse response model, used most notably as the thermal core of the FaIR model [@smith_2018_fairv1_3].
 The conversion between the two is an implementation of the proof by @geoffroy_2013_two_layer1.
@@ -77,7 +77,7 @@ It was used in Phase 1 of the Reduced Complexity Model Intercomparison Project [
 The FaIR model [@fair_repo] implements a mathematically equivalent model (under certain assumptions) but does not provide as clear a conversion between the two-layer model and the two-timescale response as is provided here.
 We hope that this implementation could interface with other simple climate models like FaIR to allow simpler exploration of the combined behaviour of interacting climate components with minimal coupling headaches.
 
-As implemented here, the "OpenSCM Two Layer Model" interface is intended to be used in research or education.
+As implemented here, the OpenSCM Two Layer Model interface is intended to be used in research or education.
 
 # Acknowledgements
 
