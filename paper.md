@@ -8,7 +8,7 @@ tags:
   - energy balance
   - reduced complexity climate model
 authors:
-  - name: Zebedee R. J. Nicholls
+  - name: Zebedee Nicholls
     orcid: 0000-0003-0872-7098
     affiliation: "1, 2, 3"
   - name: Jared Lewis
