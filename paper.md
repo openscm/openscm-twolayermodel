@@ -12,7 +12,7 @@ authors:
     orcid: 0000-0003-0872-7098
     affiliation: "1, 2, 3"
   - name: Jared Lewis
-    affiliation: "1, 2"
+    affiliation: "1, 2, 3"
 affiliations:
  - name: Australian-German Climate & Energy College, The University of Melbourne, Parkville, Victoria, Australia
    index: 1
