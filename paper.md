@@ -29,7 +29,7 @@ bibliography: paper.bib
 
 The evolution of the climate is controlled by highly complex physical dynamics.
 However, simplified representations are surprisingly powerful tools for understanding these dynamics [@held_2010_two_layer] and making climate projections [@meinshausen_2011_rcp].
-The field of simple climate modelling is widely used, in particular for assessing the climatic implications of large numbers of different emissions scenarios, a task which cannot be performed with more complex models because of computational constraints.
+The field of simple climate modelling is widely used, in particular for assessing the climatic implications of large numbers of different emissions scenarios, a task that cannot be performed with more complex models because of computational constraints.
 
 One of the most commonly used models of the climate's response to changes in the "Earth's energy balance"
 (energy input compared to energy output of the earth system) is the two-layer model originally introduced by @held_2010_two_layer.
@@ -40,13 +40,13 @@ As a result, in response to a perturbation, the model responds with a distinctiv
 Since @held_2010_two_layer, the model has been extended to include updated representations of the efficiency of ocean heat uptake [@geoffroy_2013_two_layer2] as well as a state-dependent response to radiative forcing [@bloch_johnson_2015_feedback_dependence; @rohrschneider_2019_simple].
 
 There are many simple climate models in the scientific literature [@rcmip_phase_1].
-Given the context of this paper, below we provide a table of openly accessible models, their programming language and approach.
+Given the context of this paper, we provide below a table of openly accessible models, their programming language, and their approach.
 These models are conceptually similar to the two-layer model implemented here except they use different parameterisations for ocean heat uptake and the relationship between ocean heat uptake and warming.
-On top of the relationship between ocean heat uptake and warming, these models also implement many other components of the climate system, e.g. carbon cycle, methane cycle and the relationship between changes in atmospheric greenhouse gas concentrations and atmospheric energy fluxes.
+On top of the relationship between ocean heat uptake and warming, these models also implement many other components of the climate system, e.g., carbon cycle, methane cycle, and the relationship between changes in atmospheric greenhouse gas concentrations and atmospheric energy fluxes.
 The exception is the FaIR model [@smith_2018_fairv1_3], which uses the two-layer model as its thermal core.
 
 OpenSCM Two Layer Model is an object-oriented and open-source implementation of the two-layer model.
-It is written in Python, a user-friendly open-source language which is popular in the climate sciences, and uses the Pint package [@pint], a widely used units library, for unit handling.
+It is written in Python, a user-friendly open-source language that is popular in the climate sciences, and uses the Pint package [@pint], a widely used units library, for unit handling.
 It provides an extensible interface for the two-layer model, which could then be coupled with other modules as researchers see fit.
 The implementation also provides an easy way to convert between the two-layer model of @held_2010_two_layer and the mathematically equivalent two-timescale impulse response model, used most notably as the thermal core of the FaIR model [@smith_2018_fairv1_3].
 The conversion between the two is an implementation of the proof by @geoffroy_2013_two_layer1.
@@ -60,7 +60,7 @@ The conversion between the two is an implementation of the proof by @geoffroy_20
 | [OSCAR](https://github.com/tgasser/OSCAR) | Energy balance with book-keeping land carbon cycle [@Gasser_2020_asdfjk], [github.com/tgasser/OSCAR](https://github.com/tgasser/OSCAR) | Python |
 | [WASP](https://github.com/WASP-ESM/WASP_Earth_System_Model) | Energy balance with 8-box carbon cycle [@Goodwin_2019_ggfp6s], [github.com/WASP-ESM/WASP_Earth_System_Model](https://github.com/WASP-ESM/WASP_Earth_System_Model) | C++ |
 
-  : Brief overview of other simple climate models available in the scientific literature. Shown is the model name, a brief description and relevant URL(s) and the programming language in which the model is written. The programming language shown is the one used for the model's core, other languages might be used in the development repositories for e.g. plotting. For a more extensive list of simple climate models and references which describe the models in detail, see Table 1 of @rcmip_phase_1.
+  : Brief overview of other simple climate models available in the scientific literature. Shown is the model name, a brief description and relevant URL(s), and the programming language in which the model is written. The programming language shown is the one used for the model's core; other languages might be used in the development repositories for, e.g., plotting. For a more extensive list of simple climate models and references which describe the models in detail, see Table 1 of @rcmip_phase_1.
 
 # Statement of need
 
