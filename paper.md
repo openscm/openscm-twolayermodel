@@ -9,7 +9,7 @@ tags:
   - reduced complexity climate model
 authors:
   - name: Zebedee Nicholls
-    orcid: 0000-0003-0872-7098
+    orcid: 0000-0002-4767-2723
     affiliation: "1, 2, 3"
   - name: Jared Lewis
     orcid: 0000-0002-8155-8924
