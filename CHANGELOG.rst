@@ -14,8 +14,16 @@ The changes listed in this file are categorised as follows:
     - Fixed: any bug fixes
     - Security: in case of vulnerabilities.
 
-master
-------
+v0.2.3 - 2021-04-27
+-------------------
+
+Fixed
+~~~~~
+
+- (`#34 <https://github.com/openscm/openscm-twolayermodel/pull/34>`_, `#35 <https://github.com/openscm/openscm-twolayermodel/pull/35>`_, `#36 <https://github.com/openscm/openscm-twolayermodel/pull/36>`_) Final tweaks to JOSS paper
+
+v0.2.2 - 2021-04-27
+-------------------
 
 Added
 ~~~~~
