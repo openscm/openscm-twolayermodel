@@ -2,11 +2,11 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 from openscm_units import unit_registry as ur
-from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import ImpulseResponseModel, TwoLayerModel
 from openscm_twolayermodel.base import _calculate_geoffroy_helper_parameters
 from openscm_twolayermodel.constants import DENSITY_WATER, HEAT_CAPACITY_WATER
+from openscm_twolayermodel.testing import TwoLayerVariantTester
 
 
 class TestImpulseResponseModel(TwoLayerVariantTester):
@@ -34,7 +34,7 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         res = self.tmodel(**init_kwargs)
 
         for k, v in init_kwargs.items():
-            assert getattr(res, k) == v, "{} not set properly".format(k)
+            assert getattr(res, k) == v, f"{k} not set properly"
 
         assert np.isnan(res.erf)
         assert np.isnan(res._temp1_mag)
@@ -42,7 +42,10 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         assert np.isnan(res._rndt_mag)
 
     def test_init_backwards_timescales_error(self):
-        init_kwargs = dict(d1=250.0 * ur("yr"), d2=3 * ur("yr"),)
+        init_kwargs = dict(
+            d1=250.0 * ur("yr"),
+            d2=3 * ur("yr"),
+        )
 
         error_msg = "The short-timescale must be d1"
         with pytest.raises(ValueError, match=error_msg):
@@ -133,7 +136,8 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
             ),
         )
         check_same_unit(
-            self.tmodel._erf_unit, efficacy_term.units,
+            self.tmodel._erf_unit,
+            efficacy_term.units,
         )
 
     def test_step(self):
@@ -241,7 +245,13 @@ class TestImpulseResponseModel(TwoLayerVariantTester):
         td2 = 300.0 * ur("yr")
         tefficacy = 1.2 * ur("dimensionless")
 
-        start_paras = dict(d1=td1, d2=td2, q1=tq1, q2=tq2, efficacy=tefficacy,)
+        start_paras = dict(
+            d1=td1,
+            d2=td2,
+            q1=tq1,
+            q2=tq2,
+            efficacy=tefficacy,
+        )
 
         mod_instance = self.tmodel(**start_paras)
 
