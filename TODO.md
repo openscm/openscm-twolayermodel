@@ -2,3 +2,4 @@
 - fix up docs (switch everything to markdown, get build going again)
 - fix up checks
 - check that nothing important got lost from the Makefile or CI
+- fix up CHANGELOG
