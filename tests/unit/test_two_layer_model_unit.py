@@ -4,11 +4,11 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 from openscm_units import unit_registry as ur
-from test_model_base import TwoLayerVariantTester
 
 from openscm_twolayermodel import TwoLayerModel
 from openscm_twolayermodel.base import _calculate_geoffroy_helper_parameters
 from openscm_twolayermodel.constants import DENSITY_WATER, HEAT_CAPACITY_WATER
+from openscm_twolayermodel.testing import TwoLayerVariantTester
 
 
 class TestTwoLayerModel(TwoLayerVariantTester):
@@ -38,7 +38,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         res = self.tmodel(**init_kwargs)
 
         for k, v in init_kwargs.items():
-            assert getattr(res, k) == v, "{} not set properly".format(k)
+            assert getattr(res, k) == v, f"{k} not set properly"
 
         assert np.isnan(res.erf)
         assert np.isnan(res._temp_upper_mag)
@@ -60,7 +60,10 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
     def test_heat_capacity_upper_no_setter(self):
         model = self.tmodel()
-        with pytest.raises(AttributeError, match="can't set attribute"):
+        error_msg = (
+            "property 'heat_capacity_upper' of 'TwoLayerModel' object has no setter"
+        )
+        with pytest.raises(AttributeError, match=error_msg):
             model.heat_capacity_upper = 4
 
     def test_heat_capacity_lower(self, check_equal_pint):
@@ -78,7 +81,10 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
     def test_heat_capacity_lower_no_setter(self):
         model = self.tmodel()
-        with pytest.raises(AttributeError, match="can't set attribute"):
+        error_msg = (
+            "property 'heat_capacity_lower' of 'TwoLayerModel' object has no setter"
+        )
+        with pytest.raises(AttributeError, match=error_msg):
             model.heat_capacity_lower = 4
 
     def test_calculate_next_temp_upper(self, check_same_unit):
@@ -90,7 +96,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         ta = 0.02
         tefficacy = 0.9
         teta = 0.78
-        theat_capacity_upper = 10 ** 10
+        theat_capacity_upper = 10**10
 
         res = self.tmodel._calculate_next_temp_upper(
             tdelta_t,
@@ -163,7 +169,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         ttemp_upper = 0.1
         ttemp_lower = 0.2
         teta = 0.78
-        theat_capacity_lower = 10 ** 8
+        theat_capacity_lower = 10**8
 
         res = self.tmodel._calculate_next_temp_lower(
             tdelta_t, ttemp_lower, ttemp_upper, teta, theat_capacity_lower
@@ -177,7 +183,8 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
         # check internal units make sense
         check_same_unit(
-            self.tmodel._temp_upper_unit, self.tmodel._temp_lower_unit,
+            self.tmodel._temp_upper_unit,
+            self.tmodel._temp_lower_unit,
         )
         check_same_unit(
             self.tmodel._temp_lower_unit,
@@ -198,8 +205,8 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         ttemp_lower_t = 0.2
         ttemp_upper_t_prev = 0.09
         ttemp_lower_t_prev = 0.18
-        theat_capacity_upper = 10 ** 10
-        theat_capacity_lower = 10 ** 8
+        theat_capacity_upper = 10**10
+        theat_capacity_lower = 10**8
 
         res = self.tmodel._calculate_next_rndt(
             tdelta_t,
@@ -220,7 +227,8 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
         # check internal units make sense
         check_same_unit(
-            self.tmodel._temp_upper_unit, self.tmodel._temp_lower_unit,
+            self.tmodel._temp_upper_unit,
+            self.tmodel._temp_lower_unit,
         )
         check_same_unit(
             (
@@ -377,12 +385,12 @@ class TestTwoLayerModel(TwoLayerVariantTester):
 
         b = (tlambda0 + tefficacy * teta) / C + teta / C_D
         b_star = (tlambda0 + tefficacy * teta) / C - teta / C_D
-        delta = b ** 2 - 4 * tlambda0 * teta / (C * C_D)
+        delta = b**2 - 4 * tlambda0 * teta / (C * C_D)
 
-        tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta ** 0.5)
-        tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta ** 0.5)
-        phi1 = C / (2 * tefficacy * teta) * (b_star - delta ** 0.5)
-        phi2 = C / (2 * tefficacy * teta) * (b_star + delta ** 0.5)
+        tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta**0.5)
+        tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta**0.5)
+        phi1 = C / (2 * tefficacy * teta) * (b_star - delta**0.5)
+        phi2 = C / (2 * tefficacy * teta) * (b_star + delta**0.5)
 
         expected = {
             "q1": tau1 * phi2 / (C * (phi2 - phi1)),
@@ -405,8 +413,7 @@ class TestTwoLayerModel(TwoLayerVariantTester):
         ta = 0.1 * ur("W/m^2/delta_degC^2")
 
         error_msg = re.escape(
-            "Cannot calculate impulse response parameters with "
-            "non-zero a={}".format(ta)
+            "Cannot calculate impulse response parameters with " f"non-zero a={ta}"
         )
         with pytest.raises(ValueError, match=error_msg):
             self.tmodel(a=ta).get_impulse_response_parameters()
@@ -426,12 +433,12 @@ def test_calculate_geoffroy_helper_parameters(check_equal_pint):
 
     b = (tlambda0 + tefficacy * teta) / C + teta / C_D
     b_star = (tlambda0 + tefficacy * teta) / C - teta / C_D
-    delta = b ** 2 - 4 * tlambda0 * teta / (C * C_D)
+    delta = b**2 - 4 * tlambda0 * teta / (C * C_D)
 
-    tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta ** 0.5)
-    tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta ** 0.5)
-    phi1 = C / (2 * tefficacy * teta) * (b_star - delta ** 0.5)
-    phi2 = C / (2 * tefficacy * teta) * (b_star + delta ** 0.5)
+    tau1 = C * C_D / (2 * tlambda0 * teta) * (b - delta**0.5)
+    tau2 = C * C_D / (2 * tlambda0 * teta) * (b + delta**0.5)
+    phi1 = C / (2 * tefficacy * teta) * (b_star - delta**0.5)
+    phi2 = C / (2 * tefficacy * teta) * (b_star + delta**0.5)
 
     a1 = phi2 * tau1 * tlambda0 / (C * (phi2 - phi1))
     a2 = -phi1 * tau2 * tlambda0 / (C * (phi2 - phi1))

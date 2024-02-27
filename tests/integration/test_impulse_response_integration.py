@@ -3,13 +3,12 @@ import numpy.testing as npt
 import pytest
 from openscm_units import unit_registry as ur
 from scmdata import ScmRun
-from test_model_integration_base import TwoLayerVariantIntegrationTester
 
 from openscm_twolayermodel import ImpulseResponseModel
+from openscm_twolayermodel.testing import TwoLayerVariantIntegrationTester
 
 
 class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
-
     tmodel = ImpulseResponseModel
 
     def test_run_scenarios_single(self):
@@ -147,7 +146,10 @@ class TestTwoLayerModel(TwoLayerVariantIntegrationTester):
 
     @pytest.mark.parametrize(
         "driver_var",
-        ("Effective Radiative Forcing", "Effective Radiative Forcing|CO2",),
+        (
+            "Effective Radiative Forcing",
+            "Effective Radiative Forcing|CO2",
+        ),
     )
     def test_run_scenarios_multiple_drive_var(self, driver_var):
         ts1_erf = np.linspace(0, 4, 101)

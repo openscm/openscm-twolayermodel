@@ -7,14 +7,18 @@ import numpy as np
 import pandas as pd
 import pint
 import pint.errors
-import tqdm.autonotebook as tqdman
 from openscm_units import unit_registry as ur
 from scmdata.run import ScmRun
 
 from .constants import DENSITY_WATER, HEAT_CAPACITY_WATER
 from .errors import UnitError
 
-# pylint: disable=invalid-name
+try:
+    import tqdm.autonotebook as tqdman
+
+    HAS_TQDM = True
+except ImportError:
+    HAS_TQDM = False
 
 
 class Model(ABC):
@@ -29,12 +33,12 @@ class Model(ABC):
     @staticmethod
     def _assert_is_pint_quantity_with_units(quantity, name, model_units):
         if not isinstance(quantity, pint.Quantity):
-            raise TypeError("{} must be a pint.Quantity".format(name))
+            raise TypeError(f"{name} must be a pint.Quantity")
 
         try:
             quantity.to(model_units)
         except pint.errors.DimensionalityError as exc:
-            raise UnitError("Wrong units for `{}`".format(name)) from exc
+            raise UnitError(f"Wrong units for `{name}`") from exc
 
     @abstractmethod
     def set_drivers(self, *args, **kwargs):
@@ -111,9 +115,7 @@ class TwoLayerVariant(Model):
         self._erf = val
         self._erf_mag = val.to(self._erf_unit).magnitude
 
-    def set_drivers(
-        self, erf
-    ):  # pylint: disable=arguments-differ # hmm need to think about this
+    def set_drivers(self, erf):  # pylint: disable=arguments-differ # hmm need to think about this
         """
         Set drivers for a model run
 
@@ -144,8 +146,8 @@ class TwoLayerVariant(Model):
     @staticmethod
     def _create_ts(base, unit, variable, values):
         out = base.copy()
-        out.index = out.index.set_levels([unit], "unit")
-        out.index = out.index.set_levels([variable], "variable")
+        out.index = out.index.set_levels(levels=[unit], level="unit")
+        out.index = out.index.set_levels(levels=[variable], level="variable")
         out.iloc[:, :] = values
 
         return out
@@ -173,7 +175,10 @@ class TwoLayerVariant(Model):
         )
 
     def run_scenarios(  # pylint:disable=too-many-locals
-        self, scenarios, driver_var="Effective Radiative Forcing", progress=True,
+        self,
+        scenarios,
+        driver_var="Effective Radiative Forcing",
+        progress=True,
     ):
         """
         Run scenarios.
@@ -209,15 +214,13 @@ class TwoLayerVariant(Model):
         driver = self._ensure_scenarios_are_scmrun(scenarios)
 
         save_paras_meta = {
-            "{} ({})".format(k, getattr(self, k).units): getattr(self, k).magnitude
+            f"{k} ({getattr(self, k).units})": getattr(self, k).magnitude
             for k in self._save_paras
         }
 
         driver = driver.filter(variable=driver_var, region="World")
         if np.equal(driver.shape[0], 0):
-            raise ValueError(
-                "No World data available for driver_var `{}`".format(driver_var)
-            )
+            raise ValueError(f"No World data available for driver_var `{driver_var}`")
 
         driver["climate_model"] = self._name
         for k, v in save_paras_meta.items():
@@ -229,12 +232,16 @@ class TwoLayerVariant(Model):
         run_store = list()
 
         driver_ts = driver.timeseries()
-        for i, (label, row) in tqdman.tqdm(
-            enumerate(driver_ts.iterrows()),
-            desc="scenarios",
-            leave=False,
-            disable=not (progress),
-        ):
+        iterator = enumerate(driver_ts.iterrows())
+        if HAS_TQDM:
+            iterator = tqdman.tqdm(
+                iterator,
+                desc="scenarios",
+                leave=False,
+                disable=not (progress),
+            )
+
+        for i, (label, row) in iterator:
             meta = dict(zip(driver_ts.index.names, label))
             row_no_nan = row.dropna()
 
@@ -283,15 +290,15 @@ def _calculate_geoffroy_helper_parameters(  # pylint:disable=too-many-locals
     b_pt2 = (eta) / (C_D)
     b = b_pt1 + b_pt2
     b_star = b_pt1 - b_pt2
-    delta = b ** 2 - (4 * lambda0 * eta) / (C * C_D)
+    delta = b**2 - (4 * lambda0 * eta) / (C * C_D)
 
     taucoeff = C * C_D / (2 * lambda0 * eta)
-    tau1 = taucoeff * (b - delta ** 0.5)
-    tau2 = taucoeff * (b + delta ** 0.5)
+    tau1 = taucoeff * (b - delta**0.5)
+    tau2 = taucoeff * (b + delta**0.5)
 
     phicoeff = C / (2 * efficacy * eta)
-    phi1 = phicoeff * (b_star - delta ** 0.5)
-    phi2 = phicoeff * (b_star + delta ** 0.5)
+    phi1 = phicoeff * (b_star - delta**0.5)
+    phi2 = phicoeff * (b_star + delta**0.5)
 
     adenom = C * (phi2 - phi1)
     a1 = tau1 * phi2 * lambda0 / adenom

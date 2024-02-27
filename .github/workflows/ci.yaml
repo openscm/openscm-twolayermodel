@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+jobs:
+  mypy:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+        with:
+          os: "ubuntu-latest"
+          python-version: "3.9"
+          venv-id: "docs"
+          poetry-dependency-install-flags: "--all-extras --only 'main,dev'"
+      - name: mypy
+        run: MYPYPATH=stubs poetry run mypy src
+
+  docs:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+        with:
+          os: "ubuntu-latest"
+          python-version: "3.9"
+          venv-id: "docs"
+          poetry-dependency-install-flags: "--all-extras --only 'main,docs'"
+      - name: docs
+        # Disable warning as error on build because something weird happens
+        # with how pint has set things up. In future, add the `-W` flag back
+        # in here.
+        # (see https://github.com/hgrecco/pint/blob/fc1aeba21823092007adc62fae96596e15aa0127/pint/registry.py#L109)
+        # and how autodoc-typehints tries to then handle the types
+        # (see https://github.com/tox-dev/sphinx-autodoc-typehints/issues/186)
+        run: poetry run sphinx-build --keep-going -T -b html docs/source docs/build
+
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-latest" ]
+        python-version: [ "3.9", "3.10", "3.11" ]
+    runs-on: "${{ matrix.os }}"
+    defaults:
+      run:
+        # This might be needed for Windows and doesn't seem to affect unix-based systems
+        # so we include it. If you have better proof of whether this is needed or not,
+        # feel free to update.
+        shell: bash
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+        with:
+          os: "${{ matrix.os }}"
+          python-version: "${{ matrix.python-version }}"
+          venv-id: "tests-${{ runner.os }}"
+          poetry-dependency-install-flags: "--all-extras"
+      - name: Run tests
+        run: |
+          poetry run pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
+          poetry run coverage report
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+
+  imports-without-extras:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-latest" ]
+        python-version: [ "3.9", "3.10", "3.11" ]
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+        with:
+          python-version: "${{ matrix.python-version }}"
+          venv-id: "imports-without-extras-${{ runner.os }}"
+          poetry-dependency-install-flags: "--only main"
+      - name: Check importable without extras
+        run: poetry run python scripts/test-install.py
+
+  check-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+        with:
+          python-version: "3.9"
+          venv-id: "check-build-${{ runner.os }}"
+          run-poetry-install: false
+          poetry-dependency-install-flags: "not used"
+      - name: Build package
+        run: |
+          poetry build --no-interaction
+      - name: Check build
+        run: |
+          tar -tvf dist/openscm_twolayermodel-*.tar.gz --wildcards '*openscm_twolayermodel/py.typed'
+
+  check-dependency-licences:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+        with:
+          python-version: "3.9"
+          venv-id: "licence-check"
+          poetry-dependency-install-flags: "--all-extras"
+      - name: Check licences of dependencies
+        shell: bash
+        run: |
+          TEMP_FILE=$(mktemp)
+          poetry export --without=tests --without=docs --without=dev > $TEMP_FILE
+          poetry run liccheck -r $TEMP_FILE -R licence-check.txt
+          cat licence-check.txt

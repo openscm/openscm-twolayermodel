@@ -1,0 +1,17 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v0.6.1
+_src_path: ../../repos/copier-core-python-repository
+email: zebedee.nicholls@climate-energy-college.org
+initial_setup: true
+name: Zebedee Nicholls
+notebook_dependencies: true
+pandas_doctests: false
+plot_dependencies: false
+project_description_short: Implementations of the two layer radiative forcing driven
+    models by [Held et al.](https://journals.ametsoc.org/doi/full/10.1175/2009JCLI3466.1)
+    and [Geoffroy et al.](https://journals.ametsoc.org/doi/pdf/10.1175/JCLI-D-12-00195.1)
+project_name_human: OpenSCM Two Layer Model
+project_name_pip: openscm-twolayermodel
+project_name_python: openscm_twolayermodel
+project_url: https://github.com/openscm/openscm-twolayermodel
+track_lock_file: true
