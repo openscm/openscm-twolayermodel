@@ -3,3 +3,4 @@
 - fix up checks
 - check that nothing important got lost from the Makefile or CI
 - fix up CHANGELOG
+- get CI passing again
