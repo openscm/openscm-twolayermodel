@@ -3566,9 +3566,9 @@ docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.link
 testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
 
 [extras]
-notebooks = ["notebook"]
+notebooks = ["notebook", "tqdm"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "d4bf091f41c1e0a407dc2e20c00c4971f74283ab739c7e4dd20001ec13d538e2"
+content-hash = "903f61f37b7566303eb63c6a3986c80e15fbdda4ca14b4fd8e01c90dcf309901"
